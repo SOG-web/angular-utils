@@ -5,7 +5,7 @@ import {
 } from "@angular-devkit/architect";
 import { JsonObject } from "@angular-devkit/core";
 import { loadGoogleFontBuildTime } from "../../../google/build-time-loader.js";
-import { loadLocalFontBuildTime } from "../../../local/loader.js";
+import { loadLocalFontBuildTime } from "../../../local/build-time-loader.js";
 import { scanForFontImports, FontImport } from "./font-scanner.js";
 import fs from "node:fs";
 import path from "node:path";
@@ -90,7 +90,8 @@ export default createBuilder<FontBuilderOptions>(
       combinedCSS +=
         "\n\n/* CSS Variables - Use with Tailwind or custom classes */\n:root {\n";
       for (const fontImport of fontImports) {
-        if (fontImport.type === "google" && fontImport.options.variable) {
+        // Process both Google fonts and local fonts
+        if (fontImport.options.variable) {
           const varName = fontImport.options.variable;
           const fontStack = [
             `'${fontImport.family}'`,

@@ -137,45 +137,46 @@ function scanForGoogleFontImports(
 
 /**
  * Scan for local font imports like localFont({ src: './font.woff2' })
+ * Handles multi-line localFont declarations
  */
 function scanForLocalFontImports(
   content: string,
   filePath: string
 ): FontImport[] {
   const imports: FontImport[] = [];
-  const lines = content.split("\n");
 
-  // Pattern to match localFont function calls
+  // Pattern to match localFont function calls (with multi-line support)
   const localFontPattern = /localFont\s*\(\s*(\{[\s\S]*?\})\s*\)/gm;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const match = localFontPattern.exec(line);
+  // Match all localFont calls in the entire file content
+  let match;
+  while ((match = localFontPattern.exec(content)) !== null) {
+    const optionsStr = match[1];
+    const matchIndex = match.index;
 
-    if (match) {
-      const optionsStr = match[1];
+    try {
+      // Parse the options object
+      const options = eval(`(${optionsStr})`);
 
-      try {
-        // Parse the options object
-        const options = eval(`(${optionsStr})`);
+      // Extract font family name from src path
+      const src = options.src;
+      const fontFamily = extractFontFamilyFromSrc(src);
 
-        // Extract font family name from src path
-        const src = options.src;
-        const fontFamily = extractFontFamilyFromSrc(src);
+      // Calculate line number
+      const lineNumber = content.substring(0, matchIndex).split("\n").length;
 
-        imports.push({
-          type: "local",
-          family: fontFamily,
-          options,
-          file: filePath,
-          line: i + 1,
-        });
-      } catch (error) {
-        console.warn(
-          `Failed to parse local font options in ${filePath}:${i + 1}`,
-          error
-        );
-      }
+      imports.push({
+        type: "local",
+        family: fontFamily,
+        options,
+        file: filePath,
+        line: lineNumber,
+      });
+    } catch (error) {
+      console.warn(
+        `Failed to parse local font options in ${filePath}`,
+        error
+      );
     }
   }
 

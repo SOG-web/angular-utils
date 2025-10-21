@@ -68,10 +68,24 @@ export class AppComponent {
 // fonts.ts
 import { localFont } from "@angular-utils/font/local";
 
+// Single font file
 export const customFont = localFont({
   src: "./fonts/my-font.woff2",
   variable: "--font-custom",
   fallback: ["system-ui", "arial"],
+  // adjustFontFallback automatically generates fallback metrics (default: true)
+});
+
+// Multiple weights and styles
+export const rubikFamily = localFont({
+  src: [
+    { path: "./static/Rubik-Regular.ttf", weight: "400", style: "normal" },
+    { path: "./static/Rubik-Bold.ttf", weight: "700", style: "normal" },
+    { path: "./static/Rubik-Italic.ttf", weight: "400", style: "italic" },
+  ],
+  variable: "--font-rubik",
+  display: "swap",
+  // Automatically uses Arial as fallback for sans-serif fonts
 });
 ```
 
@@ -278,13 +292,13 @@ interface LocalFontOptions {
         weight?: string;
         style?: string;
       }>;
-  display?: FontDisplay; // Font display strategy
+  display?: FontDisplay; // Font display strategy ('swap', 'block', 'fallback', 'optional')
   weight?: string; // Font weight
   style?: string; // Font style
-  variable?: string; // CSS variable name
-  preload?: boolean; // Whether to preload
-  fallback?: string[]; // Fallback fonts
-  adjustFontFallback?: "Arial" | "Times New Roman" | false;
+  variable?: string; // CSS variable name for Tailwind (e.g., '--font-rubik')
+  preload?: boolean; // Whether to preload (default: true)
+  fallback?: string[]; // Fallback fonts (e.g., ['system-ui', 'sans-serif'])
+  adjustFontFallback?: "Arial" | "Times New Roman" | "Courier New" | false; // Generate fallback @font-face with metrics (default: auto-detected)
   declarations?: Array<{
     // Custom CSS declarations
     prop: string;
@@ -292,6 +306,12 @@ interface LocalFontOptions {
   }>;
 }
 ```
+
+**Note**: `adjustFontFallback` for local fonts:
+
+- **Default**: Auto-detected based on font family name (sans-serif → Arial, serif → Times New Roman, mono → Courier New)
+- **Explicit**: Specify `"Arial"`, `"Times New Roman"`, or `"Courier New"` to override auto-detection
+- **Disabled**: Set to `false` to skip fallback generation
 
 ### Font Result
 
@@ -310,7 +330,8 @@ interface FontResult {
 
 ## Recent Improvements
 
-- ✅ **Automatic fallback metrics** - Generates fallback @font-face declarations to reduce CLS
+- ✅ **Automatic fallback metrics** - Generates fallback @font-face declarations for both Google and local fonts to reduce CLS
+- ✅ **Local font fallback support** - Auto-detects font category (sans/serif/mono) for optimal fallback selection
 - ✅ **Single font file scanning** - Faster builds, explicit configuration
 - ✅ **1000+ Google Fonts support** - All fonts available via `font-data.json`
 - ✅ **Better error messages** - Helpful errors showing available options
@@ -318,6 +339,7 @@ interface FontResult {
 - ✅ **Improved font axes** - Uses metadata for accurate weight ranges
 - ✅ **Better variant sorting** - Handles complex "ital,wght" formats
 - ✅ **Build-time optimization** - Fonts downloaded and self-hosted during build
+- ✅ **Browser-safe bundling** - Build-time code separated from browser code to avoid Node.js dependencies in bundles
 
 ## Available Google Fonts
 
@@ -393,15 +415,21 @@ import {
 
 ## Fallback Font Metrics (Zero Layout Shift)
 
-This package automatically generates fallback font metrics to reduce **Cumulative Layout Shift (CLS)** during font loading. When you use Google Fonts, the build process generates additional `@font-face` declarations with size-adjust properties that make system fonts match your web font dimensions.
+This package automatically generates fallback font metrics to reduce **Cumulative Layout Shift (CLS)** during font loading. Both **Google Fonts** and **local fonts** support automatic fallback generation with size-adjust properties that make system fonts match your web font dimensions.
 
 ### How it works
 
-For each Google Font, the package:
+For each font (Google or local), the package:
 
 1. Analyzes the font family to determine the best fallback (Arial, Times New Roman, or Courier New)
 2. Generates a fallback `@font-face` with override metrics
 3. Injects it into your `fonts.css` automatically
+
+**Font Detection:**
+
+- **Sans-serif fonts** (Inter, Roboto, Open Sans, Rubik, etc.) → Arial fallback
+- **Serif fonts** (Playfair Display, Merriweather, etc.) → Times New Roman fallback
+- **Monospace fonts** (Fira Code, JetBrains Mono, etc.) → Courier New fallback
 
 ### Example output
 
@@ -425,12 +453,33 @@ For each Google Font, the package:
 
 ### Configuration
 
-Fallback metrics are **enabled by default**. To disable for a specific font:
+Fallback metrics are **enabled by default** for both Google and local fonts.
+
+**Google Fonts:**
 
 ```typescript
 export const inter = Inter({
   subsets: ["latin"],
   weights: [400, 700],
+  adjustFontFallback: false, // Disable fallback metrics
+});
+```
+
+**Local Fonts:**
+
+```typescript
+export const rubik = localFont({
+  src: "./fonts/Rubik-Regular.ttf",
+  // Auto-detected as sans-serif → uses Arial fallback
+});
+
+export const customSerif = localFont({
+  src: "./fonts/MySerif.ttf",
+  adjustFontFallback: "Times New Roman", // Explicitly specify fallback
+});
+
+export const noFallback = localFont({
+  src: "./fonts/Special.woff2",
   adjustFontFallback: false, // Disable fallback metrics
 });
 ```
