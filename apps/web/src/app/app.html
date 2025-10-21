@@ -1,0 +1,166 @@
+<div class="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50">
+  <div class="container mx-auto px-4 py-12 max-w-6xl">
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="text-5xl font-bold text-gray-900 mb-4">
+        @angular-utils/font
+      </h1>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Optimized font loading for Angular with SSR support. Experience real-time font switching with Google Fonts.
+      </p>
+    </header>
+
+    <!-- Controls -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Font Selector -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-3">
+            Select Font Family
+          </label>
+          <div class="space-y-2">
+            @for (font of fonts; track font.name) {
+              <button
+                (click)="selectFont(font)"
+                [class.bg-indigo-600]="selectedFont().name === font.name"
+                [class.text-white]="selectedFont().name === font.name"
+                [class.bg-gray-100]="selectedFont().name !== font.name"
+                [class.text-gray-700]="selectedFont().name !== font.name"
+                [class.hover:bg-indigo-700]="selectedFont().name === font.name"
+                [class.hover:bg-gray-200]="selectedFont().name !== font.name"
+                class="w-full text-left px-4 py-3 rounded-lg transition-all duration-200 font-medium"
+              >
+                <div class="font-semibold">{{ font.name }}</div>
+                <div class="text-sm opacity-80">{{ font.description }}</div>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Weight Selector -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-3">
+            Select Font Weight
+          </label>
+          <div class="grid grid-cols-3 gap-3">
+            @for (weight of weights; track weight) {
+              <button
+                (click)="selectWeight(weight)"
+                [class.bg-purple-600]="selectedWeight() === weight"
+                [class.text-white]="selectedWeight() === weight"
+                [class.bg-gray-100]="selectedWeight() !== weight"
+                [class.text-gray-700]="selectedWeight() !== weight"
+                [class.hover:bg-purple-700]="selectedWeight() === weight"
+                [class.hover:bg-gray-200]="selectedWeight() !== weight"
+                class="px-4 py-3 rounded-lg transition-all duration-200 font-medium text-center"
+              >
+                {{ weight }}
+              </button>
+            }
+          </div>
+
+          <!-- Current Selection Info -->
+          <div class="mt-6 p-4 bg-linear-to-r from-indigo-50 to-purple-50 rounded-lg">
+            <div class="text-sm text-gray-600 mb-1">Current Selection</div>
+            <div class="font-bold text-gray-900">
+              {{ selectedFont().name }} · {{ selectedWeight() }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Area -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Live Preview</h2>
+
+      <!-- Large Heading Preview -->
+      <div class="mb-8 p-6 bg-gray-50 rounded-xl">
+        <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Heading Preview</div>
+        <div
+          class="text-4xl md:text-5xl transition-all duration-300"
+          [style.font-family]="currentFontStyle().fontFamily"
+          [style.font-weight]="currentFontStyle().fontWeight"
+        >
+          {{ heading }}
+        </div>
+      </div>
+
+      <!-- Paragraph Preview -->
+      <div class="mb-8 p-6 bg-gray-50 rounded-xl">
+        <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Paragraph Preview</div>
+        <div
+          class="text-lg leading-relaxed transition-all duration-300"
+          [style.font-family]="currentFontStyle().fontFamily"
+          [style.font-weight]="currentFontStyle().fontWeight"
+        >
+          {{ paragraph }}
+        </div>
+      </div>
+
+      <!-- Weight Comparison Grid -->
+      <div class="p-6 bg-gray-50 rounded-xl">
+        <div class="text-xs text-gray-500 uppercase tracking-wider mb-4">All Weights Comparison</div>
+        <div class="grid md:grid-cols-2 gap-4">
+          @for (weight of weights; track weight) {
+            <div class="p-4 bg-white rounded-lg border-2 transition-all duration-200"
+                 [class.border-purple-500]="selectedWeight() === weight"
+                 [class.border-gray-200]="selectedWeight() !== weight">
+              <div class="text-xs text-gray-500 mb-2">Weight {{ weight }}</div>
+              <div
+                class="text-2xl transition-all duration-300"
+                [style.font-family]="selectedFont().family"
+                [style.font-weight]="weight"
+              >
+                The Quick Brown Fox
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Font Details -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Font Details</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="p-4 bg-indigo-50 rounded-lg">
+          <div class="text-sm text-indigo-600 font-semibold mb-1">Family</div>
+          <div class="text-lg font-bold text-gray-900">{{ selectedFont().name }}</div>
+        </div>
+        <div class="p-4 bg-purple-50 rounded-lg">
+          <div class="text-sm text-purple-600 font-semibold mb-1">Weight</div>
+          <div class="text-lg font-bold text-gray-900">{{ selectedWeight() }}</div>
+        </div>
+        <div class="p-4 bg-pink-50 rounded-lg">
+          <div class="text-sm text-pink-600 font-semibold mb-1">Display</div>
+          <div class="text-lg font-bold text-gray-900">swap</div>
+        </div>
+      </div>
+
+      <!-- Code Example -->
+      <div class="mt-6 p-6 bg-gray-900 rounded-lg overflow-x-auto">
+        <pre class="text-sm text-gray-100"><code>import &#123; GoogleFontService &#125; from '@angular-utils/font';
+
+fontService.loadFont('{{ selectedFont().name }}', &#123;
+  weights: [{{ weights.join(', ') }}],
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+&#125;);</code></pre>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-12 text-gray-600">
+      <p class="mb-2">Built with Angular 20 + @angular-utils/font</p>
+      <p class="text-sm">
+        <a href="https://github.com" class="text-indigo-600 hover:text-indigo-700 transition-colors">
+          View on GitHub
+        </a>
+      </p>
+    </footer>
+  </div>
+</div>
+
+<router-outlet />

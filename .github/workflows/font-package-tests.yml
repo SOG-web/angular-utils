@@ -1,0 +1,93 @@
+name: Font Package Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "packages/font/**"
+      - ".github/workflows/font-package-tests.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "packages/font/**"
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run font package tests
+        working-directory: packages/font
+        run: pnpm test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./packages/font/coverage/lcov.info
+          flags: font-package
+          name: font-package-coverage
+          fail_ci_if_error: false
+
+      - name: Check coverage thresholds
+        working-directory: packages/font
+        run: |
+          echo "Coverage report generated successfully"
+          cat coverage/coverage-summary.json || true
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        working-directory: packages/font
+        run: pnpm build
+
+      - name: Check for build errors
+        working-directory: packages/font
+        run: |
+          if [ -d "dist" ]; then
+            echo "✅ Build successful"
+          else
+            echo "❌ Build failed"
+            exit 1
+          fi

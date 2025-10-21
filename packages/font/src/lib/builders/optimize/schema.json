@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "properties": {
+    "outputPath": {
+      "type": "string",
+      "description": "The output path for the build"
+    },
+    "projectRoot": {
+      "type": "string",
+      "description": "The root directory of the project"
+    },
+    "sourceRoot": {
+      "type": "string",
+      "description": "The source root directory"
+    },
+    "fontFile": {
+      "type": "string",
+      "description": "Path to the font declaration file (e.g., 'src/fonts.ts'). If not specified, will look for fonts.ts in common locations."
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Asset files to include in the build"
+    },
+    "styles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Style files to include in the build"
+    }
+  },
+  "required": ["outputPath", "projectRoot", "sourceRoot"]
+}

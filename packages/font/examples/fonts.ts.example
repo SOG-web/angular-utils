@@ -1,0 +1,113 @@
+/**
+ * Example fonts.ts file
+ * 
+ * This file demonstrates how to declare fonts for your Angular application.
+ * Place this file in your src directory (or configure a custom path).
+ * 
+ * The font scanner will automatically detect fonts declared here and optimize them
+ * during the build process.
+ */
+
+import { Inter, Roboto_Mono, Playfair_Display } from '@angular-utils/font/google';
+import { localFont } from '@angular-utils/font/local';
+
+/**
+ * Primary font: Inter
+ * A modern, highly readable sans-serif font
+ */
+export const inter = Inter({
+  weights: [400, 500, 700],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
+});
+
+/**
+ * Monospace font: Roboto Mono
+ * Perfect for code blocks and technical content
+ */
+export const robotoMono = Roboto_Mono({
+  weights: 'variable',  // Load variable font for full weight range
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-mono',
+  preload: true,
+});
+
+/**
+ * Display font: Playfair Display
+ * Elegant serif font for headings
+ */
+export const playfair = Playfair_Display({
+  weights: [400, 700],
+  styles: ['normal', 'italic'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-display',
+  preload: false,  // Only preload critical fonts
+});
+
+/**
+ * Custom local font
+ * Use local font files for branding or custom typefaces
+ */
+export const brandFont = localFont({
+  src: [
+    {
+      path: './assets/fonts/brand-regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './assets/fonts/brand-bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-brand',
+  display: 'swap',
+  preload: true,
+});
+
+/**
+ * Usage in Components:
+ * 
+ * @Component({
+ *   selector: 'app-root',
+ *   template: `
+ *     <div [class]="inter.className">
+ *       <h1 [class]="playfair.className">Welcome</h1>
+ *       <p>This is body text in Inter</p>
+ *       <code [class]="robotoMono.className">const hello = 'world';</code>
+ *     </div>
+ *   `
+ * })
+ * export class AppComponent {
+ *   inter = inter;
+ *   playfair = playfair;
+ *   robotoMono = robotoMono;
+ * }
+ * 
+ * 
+ * Usage with Tailwind CSS:
+ * 
+ * // tailwind.config.js
+ * module.exports = {
+ *   theme: {
+ *     extend: {
+ *       fontFamily: {
+ *         sans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],
+ *         mono: ['var(--font-mono)', ...defaultTheme.fontFamily.mono],
+ *         display: ['var(--font-display)', ...defaultTheme.fontFamily.serif],
+ *       }
+ *     }
+ *   }
+ * }
+ * 
+ * // Then in templates:
+ * <h1 class="font-display">Heading</h1>
+ * <p class="font-sans">Body text</p>
+ * <code class="font-mono">Code</code>
+ */
+
