@@ -4,7 +4,7 @@ import {
   createBuilder,
 } from "@angular-devkit/architect";
 import { JsonObject } from "@angular-devkit/core";
-import { loadGoogleFontBuildTime } from "../../../google/loader.js";
+import { loadGoogleFontBuildTime } from "../../../google/build-time-loader.js";
 import { loadLocalFontBuildTime } from "../../../local/loader.js";
 import { scanForFontImports, FontImport } from "./font-scanner.js";
 import fs from "node:fs";

@@ -1,4 +1,4 @@
-// Main Google Fonts exports
+// Main Google Fonts exports (browser-safe, no Node.js dependencies)
 export * from "./fonts.js";
 export * from "./service.js";
 export * from "./loader.js";
@@ -13,3 +13,6 @@ export * from "../lib/core/retry.js";
 
 // Re-export core types for convenience
 export type { GoogleFontOptions, FontResult } from "../lib/core/types.js";
+
+// Note: loadGoogleFontBuildTime is NOT exported here to avoid bundling Node.js code
+// Builders should import directly from "./build-time-loader.js"

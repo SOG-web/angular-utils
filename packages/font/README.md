@@ -135,13 +135,14 @@ The font scanner looks for a **single `fonts.ts` file** where all fonts are decl
   "projects": {
     "my-app": {
       "architect": {
-        "build": {
+        "font-optimize": {
           "builder": "@angular-utils/font:optimize",
           "options": {
-            "outputPath": "dist/my-app",
-            "projectRoot": ".",
+            "outputPath": "public",
+            "projectRoot": "",
             "sourceRoot": "src",
-            "fontFile": "src/fonts.ts" // Optional: specify custom path
+            "fontFile": "src/fonts.ts",
+            "injectTailwind": "v4"
           }
         }
       }
@@ -251,17 +252,19 @@ export function app(): string {
 
 ```typescript
 interface GoogleFontOptions {
-  weights?: number[] | "variable"; // Font weights
-  subsets?: string[]; // Font subsets (e.g., 'latin', 'latin-ext')
-  display?: FontDisplay; // Font display strategy
-  preload?: boolean; // Whether to preload the font
-  fallback?: string[]; // Fallback fonts
-  adjustFontFallback?: boolean; // Generate fallback metrics
-  variable?: string; // CSS variable name for Tailwind
-  styles?: string[]; // Font styles (e.g., 'normal', 'italic')
-  axes?: string[]; // Variable font axes
+  weights?: number[] | "variable"; // Font weights (e.g., [400, 700] or "variable")
+  subsets?: string[]; // Font subsets (e.g., ['latin', 'latin-ext'])
+  display?: FontDisplay; // Font display strategy ('swap', 'block', 'fallback', 'optional')
+  preload?: boolean; // Whether to preload the font (default: true)
+  fallback?: string[]; // Fallback fonts (e.g., ['system-ui', 'sans-serif'])
+  adjustFontFallback?: boolean; // Generate fallback @font-face with metrics (default: true)
+  variable?: string; // CSS variable name for Tailwind (e.g., '--font-inter')
+  styles?: string[]; // Font styles (e.g., ['normal', 'italic'])
+  axes?: string[]; // Variable font axes (e.g., ['wght', 'ital'])
 }
 ```
+
+**Note**: `adjustFontFallback` is enabled by default and automatically generates fallback font metrics to reduce layout shift during font loading.
 
 ### Local Font Options
 
@@ -307,13 +310,14 @@ interface FontResult {
 
 ## Recent Improvements
 
+- ✅ **Automatic fallback metrics** - Generates fallback @font-face declarations to reduce CLS
 - ✅ **Single font file scanning** - Faster builds, explicit configuration
 - ✅ **1000+ Google Fonts support** - All fonts available via `font-data.json`
 - ✅ **Better error messages** - Helpful errors showing available options
 - ✅ **Network retry logic** - Automatic retry with exponential backoff
 - ✅ **Improved font axes** - Uses metadata for accurate weight ranges
-- ✅ **Fallback metrics** - Reduces Cumulative Layout Shift (CLS)
 - ✅ **Better variant sorting** - Handles complex "ital,wght" formats
+- ✅ **Build-time optimization** - Fonts downloaded and self-hosted during build
 
 ## Available Google Fonts
 
@@ -387,6 +391,62 @@ import {
 } from "@angular-utils/font/google";
 ```
 
+## Fallback Font Metrics (Zero Layout Shift)
+
+This package automatically generates fallback font metrics to reduce **Cumulative Layout Shift (CLS)** during font loading. When you use Google Fonts, the build process generates additional `@font-face` declarations with size-adjust properties that make system fonts match your web font dimensions.
+
+### How it works
+
+For each Google Font, the package:
+
+1. Analyzes the font family to determine the best fallback (Arial, Times New Roman, or Courier New)
+2. Generates a fallback `@font-face` with override metrics
+3. Injects it into your `fonts.css` automatically
+
+### Example output
+
+```css
+/* Your main font */
+@font-face {
+  font-family: "Inter";
+  src: url(/assets/fonts/inter/...) format("woff2");
+}
+
+/* Automatically generated fallback */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  size-adjust: 100%;
+}
+```
+
+### Configuration
+
+Fallback metrics are **enabled by default**. To disable for a specific font:
+
+```typescript
+export const inter = Inter({
+  subsets: ["latin"],
+  weights: [400, 700],
+  adjustFontFallback: false, // Disable fallback metrics
+});
+```
+
+### Using the fallback
+
+In your CSS or Tailwind config, reference the fallback font:
+
+```css
+.font-inter {
+  font-family: "Inter", "Inter Fallback", system-ui, sans-serif;
+}
+```
+
+This ensures the fallback font is used while the web font loads, minimizing layout shift.
+
 ## Performance Tips
 
 1. **Use build-time optimization** for production builds
@@ -394,6 +454,7 @@ import {
 3. **Use CSS variables** for Tailwind integration
 4. **Limit font weights** to only what you need
 5. **Use font subsets** to reduce file sizes
+6. **Enable fallback metrics** (default) to reduce layout shift
 
 ## Troubleshooting
 

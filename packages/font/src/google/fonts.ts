@@ -1920,6 +1920,5 @@ export const Zilla_Slab_Highlight = fontFunctions["Zilla_Slab_Highlight"];
 // Export the service
 export { GoogleFontService } from "./service";
 
-// Export utilities
-export { loadGoogleFontBuildTime } from "./loader";
+// Export utilities (loadGoogleFontBuildTime is not exported here to avoid bundling Node.js code)
 export { getAllFontFamilies, isFontAvailable } from "./metadata";
