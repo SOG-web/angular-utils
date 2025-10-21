@@ -4,7 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "pnpm font:optimize && ng build",
+    "build:prod": "pnpm font:optimize && ng build --configuration production",
+    "font:optimize": "ng run web:font-optimize",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:web": "node dist/web/server/server.mjs"

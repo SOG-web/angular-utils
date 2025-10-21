@@ -2,7 +2,7 @@ import http from "node:http";
 import https from "node:https";
 import { URL } from "node:url";
 import fs from "node:fs";
-import { retry } from "../lib/core/retry";
+import { retry } from "../lib/core/retry.js";
 
 /**
  * Makes a simple GET request and returns the entire response as a Buffer.
@@ -69,7 +69,8 @@ export async function fetchCSSFromGoogleFonts(
   fontFamily: string,
   isDev: boolean
 ): Promise<string> {
-  if (process.env.FONT_GOOGLE_MOCKED_RESPONSES) {
+  // For testing: allow mocking responses (Node.js/build-time only)
+  if (typeof process !== "undefined" && process.env?.FONT_GOOGLE_MOCKED_RESPONSES) {
     const mockFile = require(process.env.FONT_GOOGLE_MOCKED_RESPONSES);
     const mockedResponse = mockFile[url];
     if (!mockedResponse) {
@@ -102,7 +103,8 @@ export async function fetchFontFile(
   url: string,
   isDev: boolean
 ): Promise<Buffer> {
-  if (process.env.FONT_GOOGLE_MOCKED_RESPONSES) {
+  // For testing: allow mocking responses (Node.js/build-time only)
+  if (typeof process !== "undefined" && process.env?.FONT_GOOGLE_MOCKED_RESPONSES) {
     if (url.startsWith("/")) {
       return fs.readFileSync(url);
     }

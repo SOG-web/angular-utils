@@ -1,6 +1,6 @@
-import fontData from "./font-data.json";
-import { formatAvailableValues } from "../lib/core/format-available-values";
-import { throwFontError } from "../lib/core/font-error";
+import fontData from "./font-data.json" with { type: "json" };
+import { formatAvailableValues } from "../lib/core/format-available-values.js";
+import { throwFontError } from "../lib/core/font-error.js";
 
 /**
  * Google Font metadata structure

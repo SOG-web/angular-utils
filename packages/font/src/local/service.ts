@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from "@angular/core";
-import type { LocalFontOptions, FontResult } from "../lib/core/types";
-import { localFont } from "./loader";
+import type { LocalFontOptions, FontResult } from "../lib/core/types.js";
+import { localFont } from "./loader.js";
 
 /**
  * Service for managing local fonts at runtime

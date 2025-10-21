@@ -5,7 +5,9 @@
 
 /* Smooth font transitions */
 * {
-  transition: font-family 0.3s ease, font-weight 0.3s ease;
+  transition:
+    font-family 0.3s ease,
+    font-weight 0.3s ease;
 }
 
 /* Custom scrollbar */
@@ -59,7 +61,9 @@ button::before {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  transition:
+    width 0.6s,
+    height 0.6s;
 }
 
 button:active::before {
@@ -88,7 +92,8 @@ header h1 {
 
 /* Pulse animation for selected items */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -105,11 +110,11 @@ header h1 {
   header h1 {
     font-size: 2.5rem;
   }
-  
+
   .text-4xl {
     font-size: 2rem;
   }
-  
+
   .text-5xl {
     font-size: 2.5rem;
   }
@@ -144,12 +149,6 @@ button:focus-visible {
 
 .loading {
   animation: shimmer 2s infinite;
-  background: linear-gradient(
-    to right,
-    #f0f0f0 0%,
-    #e0e0e0 50%,
-    #f0f0f0 100%
-  );
+  background: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
   background-size: 1000px 100%;
 }
-

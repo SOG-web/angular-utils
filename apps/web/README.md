@@ -1,4 +1,50 @@
-# Web
+# Font Showcase Web App
+
+An interactive demonstration of `@angular-utils/font` - optimized font loading for Angular with build-time optimization and SSR support.
+
+This project showcases multiple Google Fonts with different weights, interactive font switching, and demonstrates both runtime and build-time font optimization patterns.
+
+## Features
+
+- 🚀 **Build-time Font Optimization**: Fonts are downloaded and self-hosted during build
+- ⚡ **Interactive Font Switching**: Real-time font family and weight changes
+- 🎨 **5 Popular Google Fonts**: Inter, Roboto, Open Sans, Poppins, and Playfair Display
+- 📊 **Weight Comparison**: Side-by-side visualization of all font weights
+- 💅 **Modern UI**: Built with Angular 20 and Tailwind CSS v4
+- 🔄 **SSR Compatible**: Works with Angular Universal and `@angular/ssr`
+
+## Font System
+
+### Static Font Declaration Pattern
+
+Fonts are declared in `src/fonts.ts` using the static import pattern:
+
+```typescript
+import { Inter, Roboto } from '@angular-utils/font/google';
+
+export const inter = Inter({
+  weights: [300, 400, 500, 600, 700, 900],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
+});
+```
+
+### Build-time Optimization
+
+The Angular builder scans `src/fonts.ts` and:
+
+1. Downloads font files from Google Fonts
+2. Self-hosts them in `dist/web/browser/assets/fonts/`
+3. Generates optimized CSS with preload links
+4. Eliminates runtime network requests for fonts
+
+Run font optimization:
+
+```bash
+pnpm font:optimize
+```
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
 

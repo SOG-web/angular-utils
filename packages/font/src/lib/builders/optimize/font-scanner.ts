@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isFontAvailable } from "../../../google/metadata";
+import { isFontAvailable } from "../../../google/metadata.js";
 
 export interface FontImport {
   type: "google" | "local";
@@ -96,38 +96,36 @@ function scanForGoogleFontImports(
   filePath: string
 ): FontImport[] {
   const imports: FontImport[] = [];
-  const lines = content.split("\n");
 
-  // Pattern to match font function calls
-  const fontFunctionPattern = /^(\s*)(\w+)\s*\(\s*(\{[\s\S]*?\})\s*\)/gm;
+  // Pattern to match font function calls (can span multiple lines)
+  const fontFunctionPattern = /(\w+)\s*\(\s*\{([^}]*)\}\s*\)/g;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const match = fontFunctionPattern.exec(line);
+  let match;
+  while ((match = fontFunctionPattern.exec(content)) !== null) {
+    const functionName = match[1];
+    const optionsStr = `{${match[2]}}`;
 
-    if (match) {
-      const functionName = match[2];
-      const optionsStr = match[3];
+    // Check if this is a Google Font function (not localFont)
+    if (functionName !== "localFont" && isValidGoogleFontName(functionName)) {
+      try {
+        // Parse the options object
+        const options = eval(`(${optionsStr})`);
 
-      // Check if this is a Google Font function (not localFont)
-      if (functionName !== "localFont" && isValidGoogleFontName(functionName)) {
-        try {
-          // Parse the options object
-          const options = eval(`(${optionsStr})`);
+        // Calculate line number
+        const lineNumber = content.substring(0, match.index).split("\n").length;
 
-          imports.push({
-            type: "google",
-            family: functionName.replace(/_/g, " "),
-            options,
-            file: filePath,
-            line: i + 1,
-          });
-        } catch (error) {
-          console.warn(
-            `Failed to parse font options in ${filePath}:${i + 1}`,
-            error
-          );
-        }
+        imports.push({
+          type: "google",
+          family: functionName.replace(/_/g, " "),
+          options,
+          file: filePath,
+          line: lineNumber,
+        });
+      } catch (error) {
+        console.warn(
+          `Failed to parse font options in ${filePath}:${match[1]}`,
+          error
+        );
       }
     }
   }

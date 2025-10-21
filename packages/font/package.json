@@ -17,12 +17,14 @@
     "./local": {
       "types": "./dist/local/index.d.ts",
       "default": "./dist/local/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "builders.json",
-    "README.md"
+    "README.md",
+    "package.json"
   ],
   "builders": "./builders.json",
   "scripts": {

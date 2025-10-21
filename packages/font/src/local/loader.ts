@@ -1,30 +1,20 @@
-import fs from "node:fs";
-import path from "node:path";
 import type {
   LocalFontOptions,
   FontResult,
   FontFile,
   AdjustFontFallback,
-} from "../lib/core/types";
+} from "../lib/core/types.js";
 import {
   generateFontClassName,
   generateCompleteCSS,
-} from "../lib/core/css-generator";
+} from "../lib/core/css-generator.js";
 import {
   createFontResult,
   generateFontKey,
   fontRegistry,
   injectCSS,
   generateCSSId,
-} from "../lib/core/font-loader";
-
-// Import fontkit for font analysis
-let fontkit: any;
-try {
-  fontkit = require("fontkit");
-} catch (error) {
-  console.warn("fontkit not available, fallback metrics will not be generated");
-}
+} from "../lib/core/font-loader.js";
 
 /**
  * Calculate average character width from font metrics
@@ -159,12 +149,13 @@ export function validateLocalFontFunctionCall(
   // Validate and normalize each source
   const normalizedSrc = srcArray.map((item, index) => {
     if (typeof item === "string") {
+      const ext = getExtension(item);
       return {
         path: item,
         weight,
         style,
-        ext: path.extname(item).slice(1),
-        format: getFontFormat(path.extname(item)),
+        ext: ext.slice(1),
+        format: getFontFormat(ext),
       };
     }
 
@@ -174,12 +165,13 @@ export function validateLocalFontFunctionCall(
       );
     }
 
+    const ext = getExtension(item.path);
     return {
       path: item.path,
       weight: item.weight || weight,
       style: item.style || style,
-      ext: path.extname(item.path).slice(1),
-      format: getFontFormat(path.extname(item.path)),
+      ext: ext.slice(1),
+      format: getFontFormat(ext),
     };
   });
 
@@ -194,6 +186,32 @@ export function validateLocalFontFunctionCall(
     adjustFontFallback,
     declarations,
   };
+}
+
+/**
+ * Get file extension (browser-compatible)
+ */
+function getExtension(filePath: string): string {
+  const lastDot = filePath.lastIndexOf(".");
+  return lastDot !== -1 ? filePath.substring(lastDot) : "";
+}
+
+/**
+ * Get base name without extension (browser-compatible)
+ */
+function getBasename(filePath: string): string {
+  // Remove query strings and hashes
+  const cleanPath = filePath.split("?")[0].split("#")[0];
+  // Get the last part after any slash
+  const lastSlash = Math.max(
+    cleanPath.lastIndexOf("/"),
+    cleanPath.lastIndexOf("\\")
+  );
+  const filename =
+    lastSlash !== -1 ? cleanPath.substring(lastSlash + 1) : cleanPath;
+  // Remove extension
+  const lastDot = filename.lastIndexOf(".");
+  return lastDot !== -1 ? filename.substring(0, lastDot) : filename;
 }
 
 /**
@@ -236,10 +254,7 @@ export function localFont(options: LocalFontOptions): FontResult {
   }
 
   // Generate font family name from first file path
-  const fontFamily = path.basename(
-    validated.src[0].path,
-    path.extname(validated.src[0].path)
-  );
+  const fontFamily = getBasename(validated.src[0].path);
 
   // Generate font result
   const className = generateFontClassName(fontFamily, validated.variable);
@@ -372,6 +387,7 @@ function generateLocalFontCSS(
 
 /**
  * Build-time local font loader for Angular CLI builder
+ * This function is only called during build time by the Angular builder
  */
 export async function loadLocalFontBuildTime(
   options: LocalFontOptions,
@@ -381,6 +397,10 @@ export async function loadLocalFontBuildTime(
   files: FontFile[];
   preloadLinks: string;
 }> {
+  // Dynamic import to avoid loading Node.js modules in browser
+  const fs = await import("node:fs");
+  const path = await import("node:path");
+
   const validated = validateLocalFontFunctionCall("localFont", options);
 
   // Copy font files to output directory

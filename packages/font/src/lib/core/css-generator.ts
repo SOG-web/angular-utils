@@ -1,4 +1,4 @@
-import type { FontData, FontFile, AdjustFontFallback } from "./types";
+import type { FontData, FontFile, AdjustFontFallback } from "./types.js";
 
 /**
  * Generate @font-face CSS declarations for a font
@@ -76,8 +76,14 @@ export function generateCompleteCSS(fontData: FontData): string {
       ...(fontData.fallback || []),
     ].join(", ");
 
-    css += `\n\n.${className} {
+    css += `\n\n/* CSS Variable for ${fontData.family} */
+.${className} {
   ${fontData.variable}: ${fontStack};
+}
+
+/* Direct utility class */
+.font-${fontData.family.toLowerCase().replace(/\s+/g, "-")} {
+  font-family: ${fontStack};
 }`;
   } else {
     // Add direct class

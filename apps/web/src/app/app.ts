@@ -1,11 +1,12 @@
-import { Component, signal, computed, inject, effect } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { GoogleFontService } from '@angular-utils/font';
+import { inter, roboto, openSans, poppins, playfairDisplay } from '../fonts';
 
 interface FontOption {
   name: string;
   family: string;
   description: string;
+  fontResult: any; // FontResult from the font loader
 }
 
 @Component({
@@ -13,21 +14,47 @@ interface FontOption {
   imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
+  host: {
+    '[class]': 'fontClasses',
+  },
 })
 export class App {
-  private fontService = inject(GoogleFontService);
-
-  // Available fonts
+  // Available fonts with pre-loaded font results
   protected readonly fonts: FontOption[] = [
-    { name: 'Inter', family: 'Inter', description: 'Modern sans-serif for UI/body text' },
-    { name: 'Roboto', family: 'Roboto', description: "Google's signature font" },
-    { name: 'Open Sans', family: 'Open Sans', description: 'Friendly and readable' },
-    { name: 'Poppins', family: 'Poppins', description: 'Geometric sans-serif' },
-    { name: 'Playfair Display', family: 'Playfair Display', description: 'Elegant serif for headings' },
+    {
+      name: 'Inter',
+      family: 'Inter',
+      description: 'Modern sans-serif for UI/body text',
+      fontResult: inter,
+    },
+    {
+      name: 'Roboto',
+      family: 'Roboto',
+      description: "Google's signature font",
+      fontResult: roboto,
+    },
+    {
+      name: 'Open Sans',
+      family: 'Open Sans',
+      description: 'Friendly and readable',
+      fontResult: openSans,
+    },
+    {
+      name: 'Poppins',
+      family: 'Poppins',
+      description: 'Geometric sans-serif',
+      fontResult: poppins,
+    },
+    {
+      name: 'Playfair Display',
+      family: 'Playfair Display',
+      description: 'Elegant serif for headings',
+      fontResult: playfairDisplay,
+    },
   ];
 
   // Available weights
-  protected readonly weights = [300, 400, 500, 600, 700, 900];
+  protected readonly weights = [300, 400, 500, 600, 700, 800, 900];
 
   // Current selections
   protected readonly selectedFont = signal<FontOption>(this.fonts[0]);
@@ -35,29 +62,27 @@ export class App {
 
   // Sample texts
   protected readonly heading = 'The Quick Brown Fox Jumps Over the Lazy Dog';
-  protected readonly paragraph = 'Typography is the art and technique of arranging type to make written language legible, readable and appealing when displayed. The arrangement of type involves selecting typefaces, point sizes, line lengths, line-spacing, and letter-spacing, and adjusting the space between pairs of letters.';
+  protected readonly paragraph =
+    'Typography is the art and technique of arranging type to make written language legible, readable and appealing when displayed. The arrangement of type involves selecting typefaces, point sizes, line lengths, line-spacing, and letter-spacing, and adjusting the space between pairs of letters.';
 
   // Computed font style
   protected readonly currentFontStyle = computed(() => {
     const font = this.selectedFont();
     const weight = this.selectedWeight();
     return {
-      fontFamily: font.family,
+      fontFamily: font.fontResult.style.fontFamily,
       fontWeight: weight,
     };
   });
 
-  constructor() {
-    // Load all fonts on initialization
-    this.fonts.forEach(font => {
-      this.fontService.loadFont(font.family, {
-        weights: [300, 400, 500, 600, 700, 900],
-        subsets: ['latin'],
-        display: 'swap',
-        preload: true,
-      });
-    });
-  }
+  // Font classes for host binding (CSS variables)
+  protected readonly fontClasses = [
+    inter.className,
+    roboto.className,
+    openSans.className,
+    poppins.className,
+    playfairDisplay.className,
+  ].join(' ');
 
   protected selectFont(font: FontOption) {
     this.selectedFont.set(font);

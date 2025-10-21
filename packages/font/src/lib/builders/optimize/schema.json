@@ -31,6 +31,16 @@
         "type": "string"
       },
       "description": "Style files to include in the build"
+    },
+    "injectTailwind": {
+      "type": ["boolean", "string"],
+      "enum": [true, false, "v3", "v4"],
+      "default": false,
+      "description": "Automatically inject Tailwind CSS configuration for fonts. Set to 'v3' for Tailwind v3, 'v4' for Tailwind v4, or true to auto-detect (defaults to v4)."
+    },
+    "tailwindFile": {
+      "type": "string",
+      "description": "Custom path to Tailwind config file (for v3) or styles file (for v4). If not specified, will auto-detect."
     }
   },
   "required": ["outputPath", "projectRoot", "sourceRoot"]

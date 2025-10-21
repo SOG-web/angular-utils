@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isFontAvailable } from "../../google/metadata";
+import { isFontAvailable } from "../../google/metadata.js";
 
 export interface FontImport {
   type: "google" | "local";

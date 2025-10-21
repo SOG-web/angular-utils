@@ -1,5 +1,5 @@
-import type { FontResult } from "./types";
-import { generateFontClassName } from "./css-generator";
+import type { FontResult } from "./types.js";
+import { generateFontClassName } from "./css-generator.js";
 
 /**
  * Font registry to track loaded fonts and prevent duplicates

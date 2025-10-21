@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from "@angular/core";
-import type { GoogleFontOptions, FontResult } from "../lib/core/types";
-import { createGoogleFont } from "./loader";
+import type { GoogleFontOptions, FontResult } from "../lib/core/types.js";
+import { createGoogleFont } from "./loader.js";
 
 /**
  * Service for managing Google Fonts at runtime

@@ -10,6 +10,16 @@
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {
+        "font-optimize": {
+          "builder": "@angular-utils/font:optimize",
+          "options": {
+            "outputPath": "public",
+            "projectRoot": "",
+            "sourceRoot": "src",
+            "fontFile": "src/fonts.ts",
+            "injectTailwind": "v4"
+          }
+        },
         "build": {
           "builder": "@angular/build:application",
           "options": {
@@ -19,16 +29,20 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@angular-utils/font/dist/assets",
+                "output": "assets/fonts"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
               "entry": "src/server.ts"
-            }
+            },
+            "prerender": false
           },
           "configurations": {
             "production": {
@@ -79,12 +93,13 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "a52c990e-6945-4ef1-935d-868079d1922f"
   }
 }

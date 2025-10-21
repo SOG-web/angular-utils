@@ -1,7 +1,7 @@
 {
   "builders": {
     "optimize": {
-      "implementation": "./src/lib/builders/optimize/index.ts",
+      "implementation": "./dist/lib/builders/optimize/index.js",
       "schema": "./src/lib/builders/optimize/schema.json",
       "description": "Optimizes and self-hosts fonts at build time"
     }

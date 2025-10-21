@@ -2,27 +2,26 @@ import type {
   GoogleFontOptions,
   FontResult,
   FontFile,
-} from "../lib/core/types";
-import { validateWeights, validateSubsets, validateStyles } from "./metadata";
+} from "../lib/core/types.js";
+import {
+  validateWeights,
+  validateSubsets,
+  validateStyles,
+} from "./metadata.js";
 import {
   getGoogleFontsUrl,
   getFontAxes,
   findFontFilesInCss,
-} from "./font-utils";
-import { fetchCSSFromGoogleFonts, fetchFontFile } from "./fetch-resource";
+} from "./font-utils.js";
 import {
   generateFontClassName,
   generatePreloadLinks,
-} from "../lib/core/css-generator";
+} from "../lib/core/css-generator.js";
 import {
   createFontResult,
   generateFontKey,
   fontRegistry,
-  injectCSS,
-  generateCSSId,
-} from "../lib/core/font-loader";
-import fs from "node:fs";
-import path from "node:path";
+} from "../lib/core/font-loader.js";
 
 /**
  * Create a Google Font configuration
@@ -64,103 +63,15 @@ export function createGoogleFont(
   // Register the font
   fontRegistry.register(cacheKey, result);
 
-  // For build-time optimization, this would be handled by the Angular builder
-  // For runtime, we can load fonts dynamically
-  if (typeof window !== "undefined") {
-    loadGoogleFontRuntime(fontFamily, {
-      weights,
-      subsets,
-      styles,
-      display,
-      preload,
-      fallback,
-      variable,
-    });
-  }
+  // NOTE: Fonts are loaded via CSS at build time by the Angular builder
+  // No runtime loading happens - this is a pure function that only returns metadata
 
   return result;
 }
 
 /**
- * Load Google Font at runtime (client-side only)
- */
-async function loadGoogleFontRuntime(
-  fontFamily: string,
-  options: {
-    weights: string[];
-    subsets: string[];
-    styles: string[];
-    display: string;
-    preload: boolean;
-    fallback: string[];
-    variable?: string;
-  }
-): Promise<void> {
-  try {
-    // Generate Google Fonts URL
-    const axes = getFontAxes(fontFamily, options.weights, options.styles);
-    const url = getGoogleFontsUrl(fontFamily, axes, options.display);
-
-    // Fetch CSS
-    const css = await fetchCSSFromGoogleFonts(url, fontFamily, true);
-
-    // Find font files
-    const fontFiles = findFontFilesInCss(css, options.subsets);
-
-    // Generate optimized CSS with local font paths
-    const optimizedCSS = generateOptimizedCSS(
-      fontFamily,
-      css,
-      fontFiles,
-      options
-    );
-
-    // Inject CSS
-    const cssId = generateCSSId(fontFamily);
-    injectCSS(optimizedCSS, cssId);
-
-    // Mark as injected
-    fontRegistry.markCSSInjected(generateFontKey(fontFamily, options));
-  } catch (error) {
-    console.error(`Failed to load Google Font "${fontFamily}":`, error);
-  }
-}
-
-/**
- * Generate optimized CSS for Google Fonts
- */
-function generateOptimizedCSS(
-  fontFamily: string,
-  originalCSS: string,
-  fontFiles: Array<{ googleFontFileUrl: string; preloadFontFile: boolean }>,
-  options: {
-    display: string;
-    fallback: string[];
-    variable?: string;
-  }
-): string {
-  // Replace Google Fonts URLs with local paths
-  let optimizedCSS = originalCSS;
-
-  for (const fontFile of fontFiles) {
-    const localPath = `/assets/fonts/${fontFamily.toLowerCase().replace(/\s+/g, "-")}/${fontFile.googleFontFileUrl.split("/").pop()}`;
-    optimizedCSS = optimizedCSS.replace(fontFile.googleFontFileUrl, localPath);
-  }
-
-  // Add CSS variable if specified
-  if (options.variable) {
-    const fontStack = [`'${fontFamily}'`, ...options.fallback].join(", ");
-
-    optimizedCSS += `\n\n.${generateFontClassName(fontFamily, options.variable)} {
-  ${options.variable}: ${fontStack};
-}`;
-  }
-
-  return optimizedCSS;
-}
-
-/**
  * Build-time font loader for Angular CLI builder
+ * This function is only called during build time by the Angular builder
  */
 export async function loadGoogleFontBuildTime(
   fontFamily: string,
@@ -171,6 +82,13 @@ export async function loadGoogleFontBuildTime(
   files: FontFile[];
   preloadLinks: string;
 }> {
+  // Dynamic import to avoid loading Node.js modules in browser
+  const fs = await import("node:fs");
+  const path = await import("node:path");
+  const { fetchCSSFromGoogleFonts, fetchFontFile } = await import(
+    "./fetch-resource.js"
+  );
+
   // Validate options
   const weights = validateWeights(fontFamily, options.weights || [400]);
   const subsets = validateSubsets(fontFamily, options.subsets || ["latin"]);

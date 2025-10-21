@@ -4,9 +4,9 @@ import {
   createBuilder,
 } from "@angular-devkit/architect";
 import { JsonObject } from "@angular-devkit/core";
-import { loadGoogleFontBuildTime } from "../../../google/loader";
-import { loadLocalFontBuildTime } from "../../../local/loader";
-import { scanForFontImports } from "./font-scanner";
+import { loadGoogleFontBuildTime } from "../../../google/loader.js";
+import { loadLocalFontBuildTime } from "../../../local/loader.js";
+import { scanForFontImports, FontImport } from "./font-scanner.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -14,9 +14,9 @@ export interface FontBuilderOptions extends JsonObject {
   outputPath: string;
   projectRoot: string;
   sourceRoot: string;
-  fontFile?: string | undefined;
-  assets?: string[];
-  styles?: string[];
+  fontFile: string;
+  assets: string[];
+  styles: string[];
 }
 
 /**
@@ -82,16 +82,32 @@ export default createBuilder<FontBuilderOptions>(
         }
       }
 
-      // 3. Generate combined CSS
+      // 3. Generate combined CSS with utility classes and variables
       context.logger.info("🎨 Generating optimized CSS...");
-      const combinedCSS = processedFonts.map((font) => font.css).join("\n\n");
+      let combinedCSS = processedFonts.map((font) => font.css).join("\n\n");
 
-      // 4. Write CSS to output
+      // 4. Add CSS variables to :root (no class conflicts with Tailwind)
+      combinedCSS +=
+        "\n\n/* CSS Variables - Use with Tailwind or custom classes */\n:root {\n";
+      for (const fontImport of fontImports) {
+        if (fontImport.type === "google" && fontImport.options.variable) {
+          const varName = fontImport.options.variable;
+          const fontStack = [
+            `'${fontImport.family}'`,
+            ...(fontImport.options.fallback || []),
+          ].join(", ");
+
+          combinedCSS += `  ${varName}: ${fontStack};\n`;
+        }
+      }
+      combinedCSS += "}\n";
+
+      // 5. Write CSS to output
       const cssPath = `${outputPath}/assets/fonts.css`;
       await fs.promises.mkdir(`${outputPath}/assets`, { recursive: true });
       await fs.promises.writeFile(cssPath, combinedCSS);
 
-      // 5. Generate preload links
+      // 6. Generate preload links
       const preloadLinks = processedFonts
         .map((font) => font.preloadLinks)
         .filter((links) => links.trim())
@@ -102,15 +118,34 @@ export default createBuilder<FontBuilderOptions>(
         await fs.promises.writeFile(preloadPath, preloadLinks);
       }
 
-      // 6. Update angular.json assets if needed
+      // 7. Inject font CSS and preload links into index.html
+      await injectFontResources(sourceRoot, preloadLinks, context);
+
+      // 8. Inject Tailwind configuration if requested
+      if (options.injectTailwind) {
+        const version =
+          typeof options.injectTailwind === "string"
+            ? options.injectTailwind
+            : "v4"; // Default to v4
+        await injectTailwindSetup(
+          sourceRoot,
+          projectRoot,
+          fontImports,
+          version as "v3" | "v4",
+          typeof options.tailwindFile === "string"
+            ? options.tailwindFile
+            : undefined,
+          context
+        );
+      }
+
+      // 9. Update angular.json assets if needed
       await updateAngularAssets(projectRoot, outputPath);
 
       context.logger.info("✅ Font optimization completed successfully!");
       context.logger.info(`📄 Generated CSS: ${cssPath}`);
       if (preloadLinks) {
-        context.logger.info(
-          `🔗 Generated preload links: ${outputPath}/assets/font-preloads.html`
-        );
+        context.logger.info(`🔗 Preload links injected into index.html`);
       }
 
       return { success: true };
@@ -123,6 +158,304 @@ export default createBuilder<FontBuilderOptions>(
     }
   }
 );
+
+/**
+ * Inject font CSS and preload links into index.html
+ */
+async function injectFontResources(
+  sourceRoot: string,
+  preloadLinks: string,
+  context: BuilderContext
+): Promise<void> {
+  try {
+    const indexPath = path.join(sourceRoot, "index.html");
+    if (!fs.existsSync(indexPath)) {
+      context.logger.warn(`index.html not found at ${indexPath}`);
+      return;
+    }
+
+    let indexContent = fs.readFileSync(indexPath, "utf8");
+
+    // 1. Add fonts.css link if not present
+    if (!indexContent.includes('href="assets/fonts.css"')) {
+      const fontCssLink = `  <link rel="stylesheet" href="assets/fonts.css">`;
+
+      if (indexContent.includes("<!-- Font CSS -->")) {
+        // Replace existing font CSS section
+        indexContent = indexContent.replace(
+          /<!-- Font CSS -->[\s\S]*?<!-- End Font CSS -->/,
+          `<!-- Font CSS -->\n${fontCssLink}\n  <!-- End Font CSS -->`
+        );
+      } else {
+        // Add before </head>
+        const headCloseIndex = indexContent.indexOf("</head>");
+        if (headCloseIndex !== -1) {
+          const cssSection = `  <!-- Font CSS -->\n${fontCssLink}\n  <!-- End Font CSS -->\n`;
+          indexContent =
+            indexContent.slice(0, headCloseIndex) +
+            cssSection +
+            indexContent.slice(headCloseIndex);
+        }
+      }
+      context.logger.info(`✅ Injected fonts.css link into index.html`);
+    }
+
+    // 2. Add preload links if provided
+    if (preloadLinks) {
+      if (indexContent.includes("<!-- Font Preloads -->")) {
+        // Replace existing preload section
+        indexContent = indexContent.replace(
+          /<!-- Font Preloads -->[\s\S]*?<!-- End Font Preloads -->/,
+          `<!-- Font Preloads -->\n  ${preloadLinks}\n  <!-- End Font Preloads -->`
+        );
+      } else {
+        // Add preload links before </head>
+        const headCloseIndex = indexContent.indexOf("</head>");
+        if (headCloseIndex !== -1) {
+          const preloadSection = `  <!-- Font Preloads -->\n  ${preloadLinks}\n  <!-- End Font Preloads -->\n`;
+          indexContent =
+            indexContent.slice(0, headCloseIndex) +
+            preloadSection +
+            indexContent.slice(headCloseIndex);
+        }
+      }
+      context.logger.info(`✅ Injected font preloads into index.html`);
+    }
+
+    fs.writeFileSync(indexPath, indexContent, "utf8");
+  } catch (error: any) {
+    context.logger.warn(
+      `Failed to inject font resources into index.html:`,
+      error
+    );
+  }
+}
+
+/**
+ * Inject Tailwind CSS configuration for fonts
+ */
+async function injectTailwindSetup(
+  sourceRoot: string,
+  projectRoot: string,
+  fontImports: FontImport[],
+  version: "v3" | "v4",
+  customTailwindFile: string | undefined,
+  context: BuilderContext
+): Promise<void> {
+  try {
+    if (version === "v4") {
+      await injectTailwindV4(
+        sourceRoot,
+        projectRoot,
+        fontImports,
+        customTailwindFile,
+        context
+      );
+    } else {
+      await injectTailwindV3(
+        projectRoot,
+        fontImports,
+        customTailwindFile,
+        context
+      );
+    }
+  } catch (error: any) {
+    context.logger.warn(`Failed to inject Tailwind configuration:`, error);
+  }
+}
+
+/**
+ * Inject Tailwind v4 @theme configuration
+ */
+async function injectTailwindV4(
+  sourceRoot: string,
+  projectRoot: string,
+  fontImports: FontImport[],
+  customFile: string | undefined,
+  context: BuilderContext
+): Promise<void> {
+  // Find the main styles file
+  const stylesFile = customFile || findMainStylesFile(sourceRoot, projectRoot);
+  if (!stylesFile || !fs.existsSync(stylesFile)) {
+    context.logger.warn("Styles file not found for Tailwind injection");
+    return;
+  }
+
+  let stylesContent = fs.readFileSync(stylesFile, "utf8");
+
+  // Build theme configuration - only generate unique font names
+  const fontConfig: string[] = [];
+
+  for (const f of fontImports.filter((f) => f.options.variable)) {
+    const varName = f.options.variable;
+    const fallbacks = f.options.fallback || ["system-ui", "sans-serif"];
+    const fontStack = `var(${varName}), ${fallbacks.join(", ")}`;
+    const uniqueName = f.family.toLowerCase().replace(/\s+/g, "-");
+
+    // Only add unique font name - let Tailwind handle sans/serif/mono
+    fontConfig.push(`  --font-family-${uniqueName}: ${fontStack};`);
+  }
+
+  // Add helper comment for standard Tailwind classes
+  const helperComment = `  /* To use standard Tailwind classes (font-sans, font-serif), add them here:
+   * --font-family-sans: var(--font-inter), system-ui, sans-serif;
+   * --font-family-serif: var(--font-playfair-display), serif;
+   */`;
+
+  const themeBlock = `
+/* Font Configuration - Generated by @angular-utils/font */
+@theme {
+${helperComment}
+${fontConfig.join("\n")}
+}
+`;
+
+  // Check if theme block already exists
+  if (
+    stylesContent.includes(
+      "/* Font Configuration - Generated by @angular-utils/font */"
+    )
+  ) {
+    // Replace existing
+    stylesContent = stylesContent.replace(
+      /\/\* Font Configuration - Generated by @angular-utils\/font \*\/[\s\S]*?@theme \{[\s\S]*?\}\n/,
+      themeBlock
+    );
+  } else {
+    // Add after @import 'tailwindcss';
+    if (stylesContent.includes("@import 'tailwindcss'")) {
+      stylesContent = stylesContent.replace(
+        /@import 'tailwindcss';/,
+        `@import 'tailwindcss';${themeBlock}`
+      );
+    } else {
+      // Add at the end
+      stylesContent += `\n${themeBlock}`;
+    }
+  }
+
+  fs.writeFileSync(stylesFile, stylesContent, "utf8");
+  context.logger.info(
+    `✅ Injected Tailwind v4 configuration into ${path.basename(stylesFile)}`
+  );
+}
+
+/**
+ * Inject Tailwind v3 configuration
+ */
+async function injectTailwindV3(
+  projectRoot: string,
+  fontImports: FontImport[],
+  customFile: string | undefined,
+  context: BuilderContext
+): Promise<void> {
+  const configFile = customFile || findTailwindConfig(projectRoot);
+  if (!configFile || !fs.existsSync(configFile)) {
+    context.logger.warn(
+      "tailwind.config.js not found for Tailwind v3 injection"
+    );
+    return;
+  }
+
+  let configContent = fs.readFileSync(configFile, "utf8");
+
+  // Build fontFamily configuration - only generate unique font names
+  const fontFamilies: string[] = [];
+
+  for (const f of fontImports.filter((f) => f.options.variable)) {
+    const varName = f.options.variable;
+    const fallbacks = f.options.fallback || ["system-ui", "sans-serif"];
+    const fontStack = `['var(${varName})', ${fallbacks.map((fb) => `'${fb}'`).join(", ")}]`;
+    const uniqueName = f.family.toLowerCase().replace(/\s+/g, "-");
+
+    // Only add unique font name - let user configure sans/serif/mono manually
+    fontFamilies.push(`        '${uniqueName}': ${fontStack},`);
+  }
+
+  // Add helper comment
+  const helperComment = `        // To use standard Tailwind classes (font-sans, font-serif), add them here:
+        // sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        // serif: ['var(--font-playfair-display)', 'serif'],`;
+
+  const fontConfig = `      fontFamily: {
+${helperComment}
+${fontFamilies.join("\n")}
+      },`;
+
+  // Insert into theme.extend or create it
+  if (configContent.includes("extend:")) {
+    // Add to existing extend
+    if (configContent.includes("fontFamily:")) {
+      // Replace existing fontFamily
+      configContent = configContent.replace(
+        /fontFamily:\s*\{[^}]*\},?/,
+        fontConfig
+      );
+    } else {
+      // Add fontFamily to extend
+      configContent = configContent.replace(
+        /(extend:\s*\{)/,
+        `$1\n${fontConfig}`
+      );
+    }
+  } else {
+    // Create theme.extend
+    configContent = configContent.replace(
+      /(module\.exports\s*=\s*\{)/,
+      `$1\n  theme: {\n    extend: {\n${fontConfig}\n    }\n  },`
+    );
+  }
+
+  fs.writeFileSync(configFile, configContent, "utf8");
+  context.logger.info(
+    `✅ Injected Tailwind v3 configuration into ${path.basename(configFile)}`
+  );
+}
+
+/**
+ * Find the main styles file
+ */
+function findMainStylesFile(
+  sourceRoot: string,
+  projectRoot: string
+): string | null {
+  const possibleFiles = [
+    path.join(sourceRoot, "styles.css"),
+    path.join(sourceRoot, "styles.scss"),
+    path.join(sourceRoot, "styles.sass"),
+    path.join(sourceRoot, "styles.less"),
+    path.join(sourceRoot, "global.css"),
+    path.join(sourceRoot, "app/globals.css"),
+  ];
+
+  for (const file of possibleFiles) {
+    if (fs.existsSync(file)) {
+      return file;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Find Tailwind config file
+ */
+function findTailwindConfig(projectRoot: string): string | null {
+  const possibleFiles = [
+    path.join(projectRoot, "tailwind.config.js"),
+    path.join(projectRoot, "tailwind.config.ts"),
+    path.join(projectRoot, "tailwind.config.cjs"),
+    path.join(projectRoot, "tailwind.config.mjs"),
+  ];
+
+  for (const file of possibleFiles) {
+    if (fs.existsSync(file)) {
+      return file;
+    }
+  }
+
+  return null;
+}
 
 /**
  * Update angular.json to include font assets

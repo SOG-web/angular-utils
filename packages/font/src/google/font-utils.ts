@@ -1,4 +1,4 @@
-import fontData from "./font-data.json";
+import fontData from "./font-data.json" with { type: "json" };
 
 /**
  * Find all font files in the CSS response and determine which files should be preloaded.

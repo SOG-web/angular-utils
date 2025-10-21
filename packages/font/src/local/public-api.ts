@@ -1,11 +1,11 @@
 // Main local font exports
-export { localFont } from "./loader";
-export { LocalFontService } from "./service";
+export { localFont } from "./loader.js";
+export { LocalFontService } from "./service.js";
 export {
   loadLocalFontBuildTime,
   getFallbackMetricsFromFontFile,
   pickFontFileForFallbackGeneration,
-} from "./loader";
+} from "./loader.js";
 
 // Re-export core types for convenience
-export type { LocalFontOptions, FontResult } from "../lib/core/types";
+export type { LocalFontOptions, FontResult } from "../lib/core/types.js";
