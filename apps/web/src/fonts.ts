@@ -46,72 +46,52 @@ export const playfairDisplay = Playfair_Display({
 export const rubikFamily = localFont({
   src: [
     {
-      path: './static/Rubik-Light.ttf',
+      path: './src/static/Rubik-Light.ttf',
       weight: '300',
       style: 'normal',
     },
     {
-      path: './static/Rubik-LightItalic.ttf',
+      path: './src/static/Rubik-LightItalic.ttf',
       weight: '300',
       style: 'italic',
     },
     {
-      path: './static/Rubik-Regular.ttf',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: './static/Rubik-Italic.ttf',
+      path: './src/static/Rubik-Italic.ttf',
       weight: '400',
       style: 'italic',
     },
     {
-      path: './static/Rubik-Medium.ttf',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: './static/Rubik-MediumItalic.ttf',
+      path: './src/static/Rubik-MediumItalic.ttf',
       weight: '500',
       style: 'italic',
     },
     {
-      path: './static/Rubik-SemiBold.ttf',
-      weight: '600',
-      style: 'normal',
-    },
-    {
-      path: './static/Rubik-SemiBoldItalic.ttf',
+      path: './src/static/Rubik-SemiBoldItalic.ttf',
       weight: '600',
       style: 'italic',
     },
     {
-      path: './static/Rubik-Bold.ttf',
-      weight: '700',
-      style: 'normal',
-    },
-    {
-      path: './static/Rubik-BoldItalic.ttf',
+      path: './src/static/Rubik-BoldItalic.ttf',
       weight: '700',
       style: 'italic',
     },
     {
-      path: './static/Rubik-ExtraBold.ttf',
+      path: './src/static/Rubik-ExtraBold.ttf',
       weight: '800',
       style: 'normal',
     },
     {
-      path: './static/Rubik-ExtraBoldItalic.ttf',
+      path: './src/static/Rubik-ExtraBoldItalic.ttf',
       weight: '800',
       style: 'italic',
     },
     {
-      path: './static/Rubik-Black.ttf',
+      path: './src/static/Rubik-Black.ttf',
       weight: '900',
       style: 'normal',
     },
     {
-      path: './static/Rubik-BlackItalic.ttf',
+      path: './src/static/Rubik-BlackItalic.ttf',
       weight: '900',
       style: 'italic',
     },

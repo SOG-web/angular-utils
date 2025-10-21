@@ -30,7 +30,18 @@
                 [class.hover:bg-gray-200]="selectedFont().name !== font.name"
                 class="w-full text-left px-4 py-3 rounded-lg transition-all duration-200 font-medium"
               >
-                <div class="font-semibold">{{ font.name }}</div>
+                <div class="flex items-center justify-between">
+                  <div class="font-semibold">{{ font.name }}</div>
+                  @if (font.name === 'Rubik') {
+                    <span class="text-xs px-2 py-1 rounded-full" 
+                          [class.bg-green-100]="selectedFont().name !== font.name"
+                          [class.text-green-700]="selectedFont().name !== font.name"
+                          [class.bg-green-200]="selectedFont().name === font.name"
+                          [class.text-green-900]="selectedFont().name === font.name">
+                      Local
+                    </span>
+                  }
+                </div>
                 <div class="text-sm opacity-80">{{ font.description }}</div>
               </button>
             }
@@ -109,7 +120,7 @@
               <div class="text-xs text-gray-500 mb-2">Weight {{ weight }}</div>
               <div
                 class="text-2xl transition-all duration-300"
-                [style.font-family]="selectedFont().family"
+                [style.font-family]="currentFontStyle().fontFamily"
                 [style.font-weight]="weight"
               >
                 The Quick Brown Fox
@@ -140,14 +151,34 @@
 
       <!-- Code Example -->
       <div class="mt-6 p-6 bg-gray-900 rounded-lg overflow-x-auto">
-        <pre class="text-sm text-gray-100"><code>import &#123; GoogleFontService &#125; from '@angular-utils/font';
+        @if (selectedFont().name !== 'Rubik') {
+          <pre class="text-sm text-gray-100"><code>// Google Font
+import &#123; {{ selectedFont().name.replace(' ', '_') }} &#125; from '@angular-utils/font/google';
 
-fontService.loadFont('{{ selectedFont().name }}', &#123;
+export const {{ selectedFont().name.toLowerCase().replace(' ', '') }} = {{ selectedFont().name.replace(' ', '_') }}(&#123;
   weights: [{{ weights.join(', ') }}],
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-{{ selectedFont().name.toLowerCase().replace(' ', '-') }}',
   preload: true,
 &#125;);</code></pre>
+        } @else {
+          <pre class="text-sm text-gray-100"><code>// Local Font
+import &#123; localFont &#125; from '@angular-utils/font/local';
+
+export const rubikFamily = localFont(&#123;
+  src: [
+    &#123; path: './src/static/Rubik-Light.ttf', weight: '300' &#125;,
+    &#123; path: './src/static/Rubik-ExtraBold.ttf', weight: '800' &#125;,
+    &#123; path: './src/static/Rubik-Black.ttf', weight: '900' &#125;,
+    // ... more weights
+  ],
+  variable: '--font-rubik-family',
+  display: 'swap',
+  preload: true,
+  // Automatically generates fallback with Arial
+&#125;);</code></pre>
+        }
       </div>
     </div>
 
@@ -164,3 +195,4 @@ fontService.loadFont('{{ selectedFont().name }}', &#123;
 </div>
 
 <router-outlet />
+

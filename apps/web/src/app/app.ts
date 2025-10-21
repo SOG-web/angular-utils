@@ -1,6 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { inter, roboto, openSans, poppins, playfairDisplay } from '../fonts';
+import { inter, roboto, openSans, poppins, playfairDisplay, rubikFamily } from '../fonts';
 
 interface FontOption {
   name: string;
@@ -51,6 +51,12 @@ export class App {
       description: 'Elegant serif for headings',
       fontResult: playfairDisplay,
     },
+    {
+      name: 'Rubik',
+      family: 'Rubik Light',
+      description: 'Local font - Sans-serif with rounded edges',
+      fontResult: rubikFamily,
+    },
   ];
 
   // Available weights
@@ -82,6 +88,7 @@ export class App {
     openSans.className,
     poppins.className,
     playfairDisplay.className,
+    rubikFamily.className,
   ].join(' ');
 
   protected selectFont(font: FontOption) {

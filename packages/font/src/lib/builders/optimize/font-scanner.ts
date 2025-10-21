@@ -79,10 +79,12 @@ export async function scanForFontImports(
     // Scan for Google Font imports
     const googleFontImports = scanForGoogleFontImports(content, filePath);
     fontImports.push(...googleFontImports);
+    console.info(`  Found ${googleFontImports.length} Google Font import(s)`);
 
     // Scan for local font imports
     const localFontImports = scanForLocalFontImports(content, filePath);
     fontImports.push(...localFontImports);
+    console.info(`  Found ${localFontImports.length} local font import(s)`);
   }
 
   return fontImports;
@@ -135,23 +137,59 @@ function scanForGoogleFontImports(
 
 /**
  * Scan for local font imports like localFont({ src: './font.woff2' })
+ * Handles multi-line localFont declarations with nested braces
  */
 function scanForLocalFontImports(
   content: string,
   filePath: string
 ): FontImport[] {
   const imports: FontImport[] = [];
-  const lines = content.split("\n");
 
-  // Pattern to match localFont function calls
-  const localFontPattern = /localFont\s*\(\s*(\{[\s\S]*?\})\s*\)/gm;
+  // Find all localFont( occurrences
+  const localFontStart = /localFont\s*\(/g;
+  let match;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const match = localFontPattern.exec(line);
+  while ((match = localFontStart.exec(content)) !== null) {
+    const startIndex = match.index + match[0].length;
 
-    if (match) {
-      const optionsStr = match[1];
+    // Find the matching closing parenthesis by counting braces and parens
+    let braceCount = 0;
+    let parenCount = 1; // We already have the opening paren from localFont(
+    let endIndex = startIndex;
+    let inString = false;
+    let stringChar = "";
+
+    for (let i = startIndex; i < content.length && parenCount > 0; i++) {
+      const char = content[i];
+      const prevChar = i > 0 ? content[i - 1] : "";
+
+      // Handle string literals (skip counting braces/parens in strings)
+      if ((char === '"' || char === "'" || char === "`") && prevChar !== "\\") {
+        if (!inString) {
+          inString = true;
+          stringChar = char;
+        } else if (char === stringChar) {
+          inString = false;
+          stringChar = "";
+        }
+      }
+
+      if (!inString) {
+        if (char === "{") braceCount++;
+        else if (char === "}") braceCount--;
+        else if (char === "(") parenCount++;
+        else if (char === ")") parenCount--;
+      }
+
+      endIndex = i;
+    }
+
+    // Extract the options string (should start with { and end with })
+    const fullCallStr = content.substring(startIndex, endIndex + 1);
+    const optionsMatch = fullCallStr.match(/^\s*(\{[\s\S]*\})\s*\)?$/);
+
+    if (optionsMatch) {
+      const optionsStr = optionsMatch[1];
 
       try {
         // Parse the options object
@@ -161,16 +199,19 @@ function scanForLocalFontImports(
         const src = options.src;
         const fontFamily = extractFontFamilyFromSrc(src);
 
+        // Calculate line number
+        const lineNumber = content.substring(0, match.index).split("\n").length;
+
         imports.push({
           type: "local",
           family: fontFamily,
           options,
           file: filePath,
-          line: i + 1,
+          line: lineNumber,
         });
       } catch (error) {
         console.warn(
-          `Failed to parse local font options in ${filePath}:${i + 1}`,
+          `Failed to parse local font options in ${filePath}:${content.substring(0, match.index).split("\n").length}`,
           error
         );
       }
