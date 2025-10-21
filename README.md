@@ -1,135 +1,150 @@
-# Turborepo starter
+# Angular Utils
 
-This Turborepo starter is maintained by the Turborepo core team.
+A collection of utilities and packages for Angular applications.
 
-## Using this example
+## Packages
 
-Run the following command:
+### [@angular-utils/font](./packages/font)
 
-```sh
-npx create-turbo@latest
+Optimized font loading for Angular with SSR support, inspired by `@next/font`.
+
+**Features:**
+
+- 🚀 Build-time optimization for self-hosted fonts
+- ⚡ Runtime service for dynamic font loading
+- 🔄 SSR compatible with Angular 17+
+- 🎨 Tailwind v3 and v4 integration
+- 📦 1000+ Google Fonts available
+- 🏠 Local font support
+- 🎯 Zero layout shift with automatic fallback metrics
+
+**Installation:**
+
+```bash
+npm install @angular-utils/font
+# or
+pnpm add @angular-utils/font
 ```
 
-## What's inside?
+See the [font package documentation](./packages/font/README.md) for detailed usage.
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+_More Angular utility packages coming soon!_
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## Repository Structure
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+This monorepo includes:
 
-### Utilities
+- **`packages/`**: Published npm packages
+  - `font`: Font loading and optimization utilities
+- **`apps/`**: Example applications and documentation
+  - `web`: Demo application showcasing package features
 
-This Turborepo has some additional tools already setup for you:
+Each package is built with [TypeScript](https://www.typescriptlang.org/) and designed for modern Angular applications.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## Development
 
-### Build
+This monorepo uses [Turborepo](https://turborepo.com/) for efficient task management and [pnpm](https://pnpm.io/) for package management.
 
-To build all apps and packages, run the following command:
+### Prerequisites
 
-```
-cd my-turborepo
+- Node.js 18.x or 20.x
+- pnpm 8.x or higher
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+### Getting Started
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/yourusername/angular-utils.git
+cd angular-utils
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+2. **Install dependencies:**
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+pnpm install
 ```
 
-### Develop
+3. **Build all packages:**
 
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+pnpm build
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+4. **Run the demo app:**
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+pnpm dev --filter=web
 ```
 
-### Remote Caching
+### Building
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+Build all packages and apps:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+pnpm build
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Build a specific package:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
+```bash
+pnpm build --filter=@angular-utils/font
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+### Testing
+
+Run tests for all packages:
+
+```bash
+pnpm test
 ```
+
+Run tests for a specific package:
+
+```bash
+pnpm test --filter=@angular-utils/font
+```
+
+### Development Workflow
+
+When developing a package:
+
+1. Make changes to the package source code
+2. Build the package: `pnpm build --filter=<package-name>`
+3. Run tests: `pnpm test --filter=<package-name>`
+4. Test in the demo app: `pnpm dev --filter=web`
+
+## Contributing
+
+We welcome contributions! Here's how you can help:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**
+4. **Run tests**: `pnpm test`
+5. **Commit your changes**: `git commit -m 'Add amazing feature'`
+6. **Push to the branch**: `git push origin feature/amazing-feature`
+7. **Open a Pull Request**
+
+### Adding a New Package
+
+To add a new Angular utility package:
+
+1. Create a new directory in `packages/`
+2. Set up the package structure (see `packages/font` as a reference)
+3. Add package configuration (`package.json`, `tsconfig.json`)
+4. Update this README to list the new package
+5. Add comprehensive tests and documentation
+
+## License
+
+MIT License - see individual package LICENSE files for details.
 
 ## Useful Links
 
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- [Angular Documentation](https://angular.dev/)
+- [Turborepo Documentation](https://turborepo.com/)
+- [pnpm Documentation](https://pnpm.io/)
+- [@angular-utils/font Package](./packages/font/README.md)
