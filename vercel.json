@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd apps/web && pnpm build:prod",
-  "outputDirectory": "apps/web/dist/web",
-  "framework": "angular"
-}

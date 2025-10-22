@@ -11,6 +11,10 @@ Optimized font loading for Angular with SSR support, inspired by `@next/font`.
 - 📦 **Google Fonts**: 1000+ fonts available
 - 🏠 **Local fonts**: Support for custom font files
 - 🎯 **Zero layout shift**: Automatic fallback metrics
+- ✂️ **Font subsetting**: Reduce file sizes by 80-90% with text/unicode range subsetting
+- 🔧 **Variable fonts**: Full support for variable font axes (wght, slnt, wdth, custom)
+- 🌐 **Custom CDN**: Self-host fonts on your own CDN infrastructure
+- 🔄 **Advanced retry**: Configurable retry strategies with exponential backoff
 
 ## Installation
 
@@ -86,6 +90,128 @@ export const rubikFamily = localFont({
   variable: "--font-rubik",
   display: "swap",
   // Automatically uses Arial as fallback for sans-serif fonts
+});
+```
+
+### 3. Font Subsetting (Reduce File Size by 80-90%)
+
+```typescript
+// fonts.ts
+import { Inter } from "@angular-utils/font/google";
+
+// Subset by specific text
+export const interSubset = Inter({
+  weights: [400, 700],
+  subsets: ["latin"],
+  subset: {
+    text: "Hello World 123", // Only these characters
+  },
+  variable: "--font-inter-subset",
+});
+
+// Subset by unicode range
+export const interRange = Inter({
+  weights: [400, 700],
+  subsets: ["latin"],
+  subset: {
+    unicodeRange: "U+0020-007F", // Basic Latin
+  },
+  variable: "--font-inter-range",
+});
+
+// Use helper for common character sets
+import { COMMON_CHARACTER_SETS } from "@angular-utils/font/google";
+
+export const interBasic = Inter({
+  weights: [400, 700],
+  subsets: ["latin"],
+  subset: {
+    text: COMMON_CHARACTER_SETS.basicLatin, // A-Z, a-z, 0-9, basic punctuation
+  },
+  variable: "--font-inter-basic",
+});
+```
+
+### 4. Variable Fonts
+
+```typescript
+// fonts.ts
+import { Inter } from "@angular-utils/font/google";
+
+// Basic variable font
+export const interVariable = Inter({
+  weights: "variable", // Use variable font
+  subsets: ["latin"],
+  variable: "--font-inter-variable",
+});
+
+// Custom variable axes ranges
+export const interCustomAxes = Inter({
+  weights: "variable",
+  subsets: ["latin"],
+  variableAxes: {
+    wght: [100, 900], // Weight range
+    slnt: [-10, 0], // Slant range
+    wdth: [75, 125], // Width range
+  },
+  variable: "--font-inter-custom",
+});
+
+// Additional variable axes (font-specific)
+export const interAdvanced = Inter({
+  weights: "variable",
+  subsets: ["latin"],
+  axes: ["wght", "slnt"], // Specify which axes to include
+  variableAxes: {
+    wght: [200, 800],
+    slnt: [-10, 0],
+  },
+  variable: "--font-inter-advanced",
+});
+```
+
+### 5. Custom CDN Configuration
+
+```typescript
+// fonts.ts
+import { Inter } from "@angular-utils/font/google";
+
+// Use custom CDN for self-hosting
+export const interCDN = Inter({
+  weights: [400, 700],
+  subsets: ["latin"],
+  cdn: {
+    cssUrl: "https://my-cdn.com/fonts/css2",
+    fontUrl: "https://my-cdn.com/fonts/files",
+  },
+  variable: "--font-inter-cdn",
+});
+```
+
+### 6. Advanced Retry & Error Handling
+
+```typescript
+// fonts.ts
+import { Inter } from "@angular-utils/font/google";
+
+export const interResilient = Inter({
+  weights: [400, 700],
+  subsets: ["latin"],
+  retry: {
+    attempts: 5,
+    backoff: "exponential",
+    delay: 200,
+    timeout: 10000,
+    maxDelay: 5000,
+  },
+  onError: (error) => {
+    console.error("Font load failed:", error);
+    // Fallback to system font
+  },
+  onRetry: (attempt) => {
+    console.log(`Retry attempt ${attempt}`);
+  },
+  variable: "--font-inter-resilient",
 });
 ```
 
@@ -230,7 +356,7 @@ export class LocalComponent {
 }
 ```
 
-## SSR Configuration
+<!-- ## SSR Configuration
 
 ### 1. Install Angular SSR
 
@@ -258,7 +384,7 @@ export function app(): string {
     // Add your fonts here
   ]);
 }
-```
+``` -->
 
 ## API Reference
 
@@ -268,13 +394,46 @@ export function app(): string {
 interface GoogleFontOptions {
   weights?: number[] | "variable"; // Font weights (e.g., [400, 700] or "variable")
   subsets?: string[]; // Font subsets (e.g., ['latin', 'latin-ext'])
+  styles?: string[]; // Font styles (e.g., ['normal', 'italic'])
   display?: FontDisplay; // Font display strategy ('swap', 'block', 'fallback', 'optional')
   preload?: boolean; // Whether to preload the font (default: true)
   fallback?: string[]; // Fallback fonts (e.g., ['system-ui', 'sans-serif'])
   adjustFontFallback?: boolean; // Generate fallback @font-face with metrics (default: true)
   variable?: string; // CSS variable name for Tailwind (e.g., '--font-inter')
-  styles?: string[]; // Font styles (e.g., ['normal', 'italic'])
   axes?: string[]; // Variable font axes (e.g., ['wght', 'ital'])
+
+  // Advanced features
+  subset?: FontSubsetting; // Font subsetting configuration
+  variableAxes?: VariableFontAxes; // Custom variable font axes ranges
+  cdn?: CDNConfig; // Custom CDN configuration
+  retry?: RetryStrategy; // Retry strategy for network requests
+  onError?: (error: Error) => void; // Error callback
+  onRetry?: (attempt: number) => void; // Retry callback
+}
+
+interface FontSubsetting {
+  text?: string; // Specific text/characters to include (e.g., "Hello World 123")
+  unicodeRange?: string; // Custom unicode range (e.g., "U+0020-007F")
+}
+
+interface VariableFontAxes {
+  wght?: [number, number]; // Weight axis range [min, max]
+  slnt?: [number, number]; // Slant axis range [min, max]
+  wdth?: [number, number]; // Width axis range [min, max]
+  [axis: string]: [number, number] | undefined; // Custom axes (e.g., GRAD, opsz)
+}
+
+interface CDNConfig {
+  cssUrl?: string; // Base URL for CSS files (default: 'https://fonts.googleapis.com/css2')
+  fontUrl?: string; // Base URL for font files (default: 'https://fonts.gstatic.com')
+}
+
+interface RetryStrategy {
+  attempts?: number; // Number of retry attempts (default: 3)
+  backoff?: "linear" | "exponential"; // Backoff strategy (default: 'exponential')
+  delay?: number; // Initial delay in milliseconds (default: 100)
+  timeout?: number; // Request timeout in milliseconds (default: 5000)
+  maxDelay?: number; // Maximum delay in milliseconds (default: 5000)
 }
 ```
 
@@ -304,6 +463,13 @@ interface LocalFontOptions {
     prop: string;
     value: string;
   }>;
+
+  // Advanced features
+  subset?: FontSubsetting; // Font subsetting configuration (requires fontkit)
+  retry?: RetryStrategy; // Retry strategy for file operations
+  onError?: (error: Error) => void; // Error callback
+  onRetry?: (attempt: number) => void; // Retry callback
+  fallbackFont?: string; // Fallback font to use on error (default: 'system-ui')
 }
 ```
 
@@ -330,6 +496,10 @@ interface FontResult {
 
 ## Recent Improvements
 
+- ✅ **Font subsetting** - Reduce file sizes by 80-90% with text/unicode range subsetting
+- ✅ **Variable font optimization** - Full support for variable font axes (wght, slnt, wdth, custom)
+- ✅ **Custom CDN support** - Self-host fonts on your own CDN infrastructure
+- ✅ **Advanced retry logic** - Configurable retry strategies with exponential backoff and callbacks
 - ✅ **Automatic fallback metrics** - Generates fallback @font-face declarations for both Google and local fonts to reduce CLS
 - ✅ **Local font fallback support** - Auto-detects font category (sans/serif/mono) for optimal fallback selection
 - ✅ **Single font file scanning** - Faster builds, explicit configuration
@@ -340,6 +510,7 @@ interface FontResult {
 - ✅ **Better variant sorting** - Handles complex "ital,wght" formats
 - ✅ **Build-time optimization** - Fonts downloaded and self-hosted during build
 - ✅ **Browser-safe bundling** - Build-time code separated from browser code to avoid Node.js dependencies in bundles
+- ✅ **Helper utilities** - COMMON_CHARACTER_SETS and subsetting helpers for easier font optimization
 
 ## Available Google Fonts
 
@@ -496,14 +667,64 @@ In your CSS or Tailwind config, reference the fallback font:
 
 This ensures the fallback font is used while the web font loads, minimizing layout shift.
 
+## Helper Utilities
+
+### Common Character Sets
+
+For font subsetting, use predefined character sets:
+
+```typescript
+import { COMMON_CHARACTER_SETS } from "@angular-utils/font/google";
+
+// Basic Latin characters (A-Z, a-z, 0-9, basic punctuation)
+COMMON_CHARACTER_SETS.basicLatin;
+// "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,!?;:"
+
+// Extended Latin with accents
+COMMON_CHARACTER_SETS.latinExtended;
+// "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ"
+
+// Numbers and common symbols
+COMMON_CHARACTER_SETS.numbers;
+// "0123456789+-=()[]{}.,!?;:'\"@#$%^&*"
+
+// Common punctuation
+COMMON_CHARACTER_SETS.punctuation;
+// ".,!?;:'\"()[]{}/\\-_=+*&^%$#@~`|<>"
+```
+
+### Subsetting Helpers
+
+```typescript
+import { extractUniqueCharacters } from "@angular-utils/font/google";
+
+// Extract unique characters from text
+const uniqueChars = extractUniqueCharacters("Hello World!");
+// "Helo Wrd!"
+
+// Use in font subsetting
+export const interUnique = Inter({
+  weights: [400, 700],
+  subsets: ["latin"],
+  subset: {
+    text: extractUniqueCharacters("Your specific text here"),
+  },
+  variable: "--font-inter-unique",
+});
+```
+
 ## Performance Tips
 
 1. **Use build-time optimization** for production builds
 2. **Preload critical fonts** by setting `preload: true`
 3. **Use CSS variables** for Tailwind integration
 4. **Limit font weights** to only what you need
-5. **Use font subsets** to reduce file sizes
+5. **Use font subsets** to reduce file sizes by 80-90%
 6. **Enable fallback metrics** (default) to reduce layout shift
+7. **Use variable fonts** when possible for better performance
+8. **Configure retry strategies** for network resilience
+9. **Self-host fonts** with custom CDN for faster delivery
+10. **Subset fonts** using `COMMON_CHARACTER_SETS` for common use cases
 
 ## Troubleshooting
 

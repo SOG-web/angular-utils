@@ -1,5 +1,17 @@
 # Font Showcase App - Usage Guide
 
+## 📚 Documentation
+
+**For complete documentation with interactive examples, visit: [/docs](/docs)**
+
+The documentation includes:
+
+- Complete API reference with all options
+- Interactive examples and live demos
+- Advanced features (subsetting, variable fonts, CDN config)
+- Performance tips and best practices
+- Copy-to-clipboard code examples
+
 ## 🚀 Quick Start
 
 ```bash
@@ -16,16 +28,13 @@ Open `http://localhost:4200`
 ### Method 1: Tailwind Standard Classes (Recommended)
 
 ```html
-<h1 class="font-sans text-4xl font-bold">
-  Heading in Inter
-</h1>
+<h1 class="font-sans text-4xl font-bold">Heading in Inter</h1>
 
-<p class="font-serif text-lg">
-  Elegant text in Playfair Display
-</p>
+<p class="font-serif text-lg">Elegant text in Playfair Display</p>
 ```
 
 **Available Classes:**
+
 - `font-sans` → Uses Inter (first sans font)
 - `font-serif` → Uses Playfair Display
 - `font-[family:inter]` → Specifically Inter
@@ -37,16 +46,13 @@ Open `http://localhost:4200`
 ### Method 2: CSS Variables
 
 ```html
-<div style="font-family: var(--font-inter)">
-  Text in Inter
-</div>
+<div style="font-family: var(--font-inter)">Text in Inter</div>
 
-<div style="font-family: var(--font-playfair-display)">
-  Text in Playfair Display
-</div>
+<div style="font-family: var(--font-playfair-display)">Text in Playfair Display</div>
 ```
 
 **Available Variables:**
+
 - `--font-inter`
 - `--font-roboto`
 - `--font-open-sans`
@@ -62,11 +68,11 @@ import { inter, playfairDisplay } from '../fonts';
   template: `
     <div [style.fontFamily]="headingFont">Heading</div>
     <p [style.fontFamily]="bodyFont">Body text</p>
-  `
+  `,
 })
 export class MyComponent {
-  headingFont = inter.style.fontFamily;  // "'Inter'"
-  bodyFont = playfairDisplay.style.fontFamily;  // "'Playfair Display'"
+  headingFont = inter.style.fontFamily; // "'Inter'"
+  bodyFont = playfairDisplay.style.fontFamily; // "'Playfair Display'"
 }
 ```
 
@@ -103,6 +109,7 @@ pnpm font:optimize
 ```
 
 This will:
+
 - Download Lato fonts
 - Add to fonts.css
 - Add `--font-lato` variable
@@ -147,6 +154,7 @@ pnpm build:prod
 ## 🎨 Customizing Tailwind Mapping
 
 By default, the builder maps:
+
 - **First sans font** → `font-sans` (Inter)
 - **First serif font** → `font-serif` (Playfair Display)
 - **All fonts** → `font-[family:font-name]`
@@ -162,11 +170,11 @@ To customize which font maps to `font-sans`:
 
 ```typescript
 export const inter = Inter({
-  preload: true,  // ✅ Above the fold
+  preload: true, // ✅ Above the fold
 });
 
 export const specialFont = SomeFont({
-  preload: false,  // ⬜ Below the fold or conditional
+  preload: false, // ⬜ Below the fold or conditional
 });
 ```
 
@@ -175,7 +183,7 @@ export const specialFont = SomeFont({
 ```typescript
 // Don't load all weights if you don't need them
 export const inter = Inter({
-  weights: [400, 700],  // Only regular and bold
+  weights: [400, 700], // Only regular and bold
 });
 ```
 
@@ -183,7 +191,7 @@ export const inter = Inter({
 
 ```typescript
 export const inter = Inter({
-  display: 'swap',  // ✅ Show fallback immediately
+  display: 'swap', // ✅ Show fallback immediately
 });
 ```
 
@@ -227,6 +235,7 @@ cat src/index.html | grep "preload"
 ## 🎉 Summary
 
 You now have:
+
 - ✅ **5 Google Fonts** self-hosted
 - ✅ **33 font files** (woff2)
 - ✅ **Zero runtime errors**
@@ -235,4 +244,3 @@ You now have:
 - ✅ **Production ready**
 
 **Enjoy your optimized font system!** 🚀
-

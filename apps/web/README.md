@@ -12,6 +12,17 @@ This project showcases multiple Google Fonts with different weights, interactive
 - 📊 **Weight Comparison**: Side-by-side visualization of all font weights
 - 💅 **Modern UI**: Built with Angular 20 and Tailwind CSS v4
 - 🔄 **SSR Compatible**: Works with Angular Universal and `@angular/ssr`
+- 📚 **Comprehensive Documentation**: Live documentation with interactive examples
+
+## Documentation
+
+Visit the **[Documentation Page](/docs)** for:
+
+- Complete API reference with all options
+- Interactive examples and live demos
+- Advanced features (subsetting, variable fonts, CDN config)
+- Performance tips and best practices
+- Copy-to-clipboard code examples
 
 ## Font System
 

@@ -1,0 +1,163 @@
+/* Documentation component styles */
+.docs-container {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Code block styling */
+pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+}
+
+/* Copy button hover effects */
+.copy-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.copy-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Live demo styling */
+.live-demo {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+}
+
+/* Font weight demonstrations */
+.font-weight-demo {
+  transition: font-weight 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .lg\\:grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .lg\\:col-span-1 {
+    order: 2;
+  }
+
+  .lg\\:col-span-3 {
+    order: 1;
+  }
+}
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Sidebar navigation active state */
+nav a:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* Code syntax highlighting improvements */
+.hljs {
+  background: #1f2937 !important;
+  color: #d1d5db !important;
+}
+
+.hljs-keyword {
+  color: #f472b6 !important;
+}
+
+.hljs-string {
+  color: #34d399 !important;
+}
+
+.hljs-comment {
+  color: #6b7280 !important;
+  font-style: italic;
+}
+
+.hljs-number {
+  color: #fbbf24 !important;
+}
+
+.hljs-function {
+  color: #60a5fa !important;
+}
+
+/* Interactive elements */
+.interactive-demo {
+  border: 2px dashed #d1d5db;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+}
+
+.interactive-demo:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+/* Font showcase cards */
+.font-showcase {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.font-showcase:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Performance indicators */
+.performance-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.performance-indicator.good {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.performance-indicator.excellent {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* Feature badges */
+.feature-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.feature-badge.new {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.feature-badge.advanced {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.feature-badge.performance {
+  background-color: #d1fae5;
+  color: #065f46;
+}
