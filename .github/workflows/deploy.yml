@@ -23,6 +23,7 @@ jobs:
           node-version: "20"
           cache: "pnpm"
       - run: pnpm install
+      - run: pnpm build --filter=@angular-utils/font
       - run: pnpm build --filter=web
       - uses: actions/upload-pages-artifact@v3
         with:

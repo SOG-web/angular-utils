@@ -53,32 +53,39 @@ export function getGoogleFontsUrl(
   display: string,
   baseUrl: string = "https://fonts.googleapis.com/css2"
 ): string {
-  const params = new URLSearchParams();
+  // Build family parameter with axes
+  // Google Fonts CSS API v2 format: family=FontName:axis@values
+  let familyParam = fontFamily.replace(/\s+/g, "+");
 
-  // Add font family
-  params.set("family", fontFamily);
+  const axesParts: string[] = [];
 
-  // Add weights
-  if (axes.wght) {
-    params.set("wght", axes.wght.join(";"));
+  // Add italic axis first if present (Google Fonts expects ital before wght)
+  if (axes.ital) {
+    axesParts.push(`ital@${axes.ital.join(";")}`);
   }
 
-  // Add italic styles
-  if (axes.ital) {
-    params.set("ital", axes.ital.join(";"));
+  // Add weight axis
+  if (axes.wght) {
+    axesParts.push(`wght@${axes.wght.join(";")}`);
   }
 
   // Add variable axes
-  if (axes.variableAxes) {
+  if (axes.variableAxes && axes.variableAxes.length > 0) {
     for (const [tag, value] of axes.variableAxes) {
-      params.set(tag, value);
+      axesParts.push(`${tag}@${value}`);
     }
   }
 
-  // Add display
-  params.set("display", display);
+  // Combine family with axes
+  if (axesParts.length > 0) {
+    familyParam += `:${axesParts.join(",")}`;
+  }
 
-  return `${baseUrl}?${params.toString()}`;
+  // Manually construct URL to avoid over-encoding special characters
+  // Google Fonts API needs :, @, and ; to NOT be encoded in the family parameter
+  const displayParam = encodeURIComponent(display);
+
+  return `${baseUrl}?family=${familyParam}&display=${displayParam}`;
 }
 
 /**
