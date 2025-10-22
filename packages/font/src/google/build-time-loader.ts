@@ -9,6 +9,7 @@ import {
   getGoogleFontsUrl,
   getFontAxes,
   findFontFilesInCss,
+  filterCssBySubsets,
 } from "./font-utils.js";
 import { generatePreloadLinks } from "../lib/core/css-generator.js";
 import { resolveCDNConfig } from "../lib/core/cdn-config.js";
@@ -60,7 +61,8 @@ export async function loadGoogleFontBuildTime(
     fontFamily,
     axes,
     options.display || "swap",
-    cdnConfig.cssUrl
+    cdnConfig.cssUrl,
+    subsets
   );
 
   // Apply subsetting if specified
@@ -69,12 +71,15 @@ export async function loadGoogleFontBuildTime(
   }
 
   // Fetch CSS with retry strategy
-  const css = await retryWithStrategy(
+  let css = await retryWithStrategy(
     () => fetchCSSFromGoogleFonts(url, fontFamily, false),
     options.retry,
     options.onRetry,
     options.onError
   );
+
+  // Filter CSS to only include specified subsets
+  css = filterCssBySubsets(css, subsets);
 
   // Find font files
   const fontFiles = findFontFilesInCss(css, subsets);
@@ -82,13 +87,6 @@ export async function loadGoogleFontBuildTime(
   // Download font files
   const downloadedFiles: FontFile[] = [];
   const fontDir = `${outputPath}/assets/fonts/${fontFamily.toLowerCase().replace(/\s+/g, "-")}`;
-
-  // Clean up old font files before downloading new ones
-  try {
-    await fs.promises.rm(fontDir, { recursive: true, force: true });
-  } catch (error) {
-    // Directory might not exist, which is fine
-  }
 
   // Ensure directory exists
   await fs.promises.mkdir(fontDir, { recursive: true });

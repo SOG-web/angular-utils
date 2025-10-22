@@ -44,7 +44,16 @@ export default createBuilder<FontBuilderOptions>(
 
       context.logger.info(`📦 Found ${fontImports.length} font imports`);
 
-      // 2. Process each font
+      // 2. Clean up old font files before downloading new ones
+      const fontsDir = `${outputPath}/assets/fonts`;
+      try {
+        await fs.promises.rm(fontsDir, { recursive: true, force: true });
+        context.logger.info("🧹 Cleaned up old font files");
+      } catch (error) {
+        // Directory might not exist, which is fine
+      }
+
+      // 3. Process each font
       const processedFonts: Array<{
         type: "google" | "local";
         family: string;
@@ -82,11 +91,11 @@ export default createBuilder<FontBuilderOptions>(
         }
       }
 
-      // 3. Generate combined CSS with utility classes and variables
+      // 4. Generate combined CSS with utility classes and variables
       context.logger.info("🎨 Generating optimized CSS...");
       let combinedCSS = processedFonts.map((font) => font.css).join("\n\n");
 
-      // 4. Add CSS variables to :root (no class conflicts with Tailwind)
+      // 5. Add CSS variables to :root (no class conflicts with Tailwind)
       combinedCSS +=
         "\n\n/* CSS Variables - Use with Tailwind or custom classes */\n:root {\n";
       for (const fontImport of fontImports) {
@@ -103,12 +112,12 @@ export default createBuilder<FontBuilderOptions>(
       }
       combinedCSS += "}\n";
 
-      // 5. Write CSS to output
+      // 6. Write CSS to output
       const cssPath = `${outputPath}/assets/fonts.css`;
       await fs.promises.mkdir(`${outputPath}/assets`, { recursive: true });
       await fs.promises.writeFile(cssPath, combinedCSS);
 
-      // 6. Generate preload links
+      // 7. Generate preload links
       const preloadLinks = processedFonts
         .map((font) => font.preloadLinks)
         .filter((links) => links.trim())
@@ -119,10 +128,10 @@ export default createBuilder<FontBuilderOptions>(
         await fs.promises.writeFile(preloadPath, preloadLinks);
       }
 
-      // 7. Inject font CSS and preload links into index.html
+      // 8. Inject font CSS and preload links into index.html
       await injectFontResources(sourceRoot, preloadLinks, context);
 
-      // 8. Inject Tailwind configuration if requested
+      // 9. Inject Tailwind configuration if requested
       if (options.injectTailwind) {
         const version =
           typeof options.injectTailwind === "string"
@@ -140,7 +149,7 @@ export default createBuilder<FontBuilderOptions>(
         );
       }
 
-      // 9. Update angular.json assets if needed
+      // 10. Update angular.json assets if needed
       await updateAngularAssets(projectRoot, outputPath);
 
       context.logger.info("✅ Font optimization completed successfully!");

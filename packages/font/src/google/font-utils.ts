@@ -41,6 +41,70 @@ export function findFontFilesInCss(css: string, subsetsToPreload?: string[]) {
 }
 
 /**
+ * Filter CSS to only include specified subsets
+ */
+export function filterCssBySubsets(css: string, subsets: string[]): string {
+  if (!subsets || subsets.length === 0) {
+    return css;
+  }
+
+  const lines = css.split("\n");
+  const filteredLines: string[] = [];
+  let currentSubset = "";
+  let includeFontFace = false;
+  let fontFaceBlock: string[] = [];
+  let inFontFace = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Check for subset comment
+    const subsetMatch = /\/\* (.+?) \*\//.exec(line);
+    if (subsetMatch) {
+      currentSubset = subsetMatch[1];
+      includeFontFace = subsets.includes(currentSubset);
+
+      if (includeFontFace) {
+        filteredLines.push(line);
+      }
+      continue;
+    }
+
+    // Check for @font-face start
+    if (line.includes("@font-face")) {
+      inFontFace = true;
+      fontFaceBlock = [line];
+      continue;
+    }
+
+    // Collect font-face block
+    if (inFontFace) {
+      fontFaceBlock.push(line);
+
+      // Check for end of @font-face block
+      if (line.includes("}")) {
+        inFontFace = false;
+
+        // Add the block if it matches our subset
+        if (includeFontFace) {
+          filteredLines.push(...fontFaceBlock);
+        }
+
+        fontFaceBlock = [];
+      }
+      continue;
+    }
+
+    // Include other lines (like fallback @font-face blocks without subset comments)
+    if (line.trim()) {
+      filteredLines.push(line);
+    }
+  }
+
+  return filteredLines.join("\n");
+}
+
+/**
  * Generate Google Fonts URL for fetching CSS
  */
 export function getGoogleFontsUrl(
@@ -51,7 +115,8 @@ export function getGoogleFontsUrl(
     variableAxes?: [string, string][];
   },
   display: string,
-  baseUrl: string = "https://fonts.googleapis.com/css2"
+  baseUrl: string = "https://fonts.googleapis.com/css2",
+  subsets?: string[]
 ): string {
   // Build family parameter with axes
   // Google Fonts CSS API v2 format: family=FontName:axis@values
@@ -85,7 +150,15 @@ export function getGoogleFontsUrl(
   // Google Fonts API needs :, @, and ; to NOT be encoded in the family parameter
   const displayParam = encodeURIComponent(display);
 
-  return `${baseUrl}?family=${familyParam}&display=${displayParam}`;
+  // Build URL with subset parameter
+  let url = `${baseUrl}?family=${familyParam}&display=${displayParam}`;
+
+  // Add subset parameter if specified (limits which unicode ranges are returned)
+  if (subsets && subsets.length > 0) {
+    url += `&subset=${subsets.join(",")}`;
+  }
+
+  return url;
 }
 
 /**
