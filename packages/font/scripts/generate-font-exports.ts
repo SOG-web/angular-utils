@@ -15,6 +15,10 @@ const __dirname = path.dirname(__filename);
 
 const FONT_DATA_PATH = path.join(__dirname, "../src/google/font-data.json");
 const FONTS_OUTPUT_PATH = path.join(__dirname, "../src/google/fonts.ts");
+const FONT_FAMILIES_OUTPUT_PATH = path.join(
+  __dirname,
+  "../src/google/font-families.ts"
+);
 
 interface GoogleFontMetadata {
   weights: string[];
@@ -41,53 +45,182 @@ function formatFontFunctionName(fontFamily: string): string {
 }
 
 /**
+ * Generate font families union type
+ */
+function generateFontFamiliesType(fontFamilies: string[]): string {
+  const sortedFamilies = [...fontFamilies].sort();
+
+  return `/**
+ * Union type of all available Google Font families
+ * Generated from font-data.json - DO NOT EDIT MANUALLY
+ * Run: pnpm generate:fonts to regenerate
+ */
+export type GoogleFontFamily = 
+${sortedFamilies.map((family) => `  | "${family}"`).join("\n")};
+
+/**
+ * Get all available font families
+ */
+export const ALL_FONT_FAMILIES: GoogleFontFamily[] = [
+${sortedFamilies.map((family) => `  "${family}"`).join(",\n")}
+] as const;
+
+/**
+ * Check if a font family is available
+ */
+export function isFontFamilyAvailable(fontFamily: string): fontFamily is GoogleFontFamily {
+  return ALL_FONT_FAMILIES.includes(fontFamily as GoogleFontFamily);
+}
+`;
+}
+
+/**
+ * Generate per-font metadata types using lookup tables
+ */
+function generatePerFontTypes(fontData: FontDataMap): string {
+  const fontFamilies = Object.keys(fontData).sort();
+
+  // Generate weights lookup table
+  const weightsMap = fontFamilies
+    .map((family) => {
+      const metadata = fontData[family];
+      const weights = metadata.weights
+        .map((w) => (w === "variable" ? '"variable"' : w))
+        .join(" | ");
+      return `  "${family}": ${weights || 'number | "variable"'};`;
+    })
+    .join("\n");
+
+  // Generate subsets lookup table
+  const subsetsMap = fontFamilies
+    .map((family) => {
+      const metadata = fontData[family];
+      const subsets = metadata.subsets.map((s) => `"${s}"`).join(" | ");
+      return `  "${family}": ${subsets || "string"};`;
+    })
+    .join("\n");
+
+  // Generate styles lookup table
+  const stylesMap = fontFamilies
+    .map((family) => {
+      const metadata = fontData[family];
+      const styles = metadata.styles.map((s) => `"${s}"`).join(" | ");
+      return `  "${family}": ${styles || '"normal" | "italic"'};`;
+    })
+    .join("\n");
+
+  // Generate axes lookup table
+  const axesMap = fontFamilies
+    .map((family) => {
+      const metadata = fontData[family];
+      if (metadata.axes && metadata.axes.length > 0) {
+        const axes = metadata.axes.map((a) => `"${a.tag}"`).join(" | ");
+        return `  "${family}": ${axes};`;
+      }
+      return `  "${family}": never;`;
+    })
+    .join("\n");
+
+  return `
+/**
+ * Font weights lookup table
+ */
+type FontWeightsMap = {
+${weightsMap}
+};
+
+/**
+ * Font subsets lookup table
+ */
+type FontSubsetsMap = {
+${subsetsMap}
+};
+
+/**
+ * Font styles lookup table
+ */
+type FontStylesMap = {
+${stylesMap}
+};
+
+/**
+ * Font axes lookup table
+ */
+type FontAxesMap = {
+${axesMap}
+};
+
+/**
+ * Get valid weights for a specific font family
+ */
+export type WeightsFor<T extends GoogleFontFamily> = 
+  T extends keyof FontWeightsMap ? FontWeightsMap[T] : number | "variable";
+
+/**
+ * Get valid subsets for a specific font family
+ */
+export type SubsetsFor<T extends GoogleFontFamily> = 
+  T extends keyof FontSubsetsMap ? FontSubsetsMap[T] : string;
+
+/**
+ * Get valid styles for a specific font family
+ */
+export type StylesFor<T extends GoogleFontFamily> = 
+  T extends keyof FontStylesMap ? FontStylesMap[T] : "normal" | "italic";
+
+/**
+ * Get valid axes for a specific font family
+ */
+export type AxesFor<T extends GoogleFontFamily> = 
+  T extends keyof FontAxesMap ? FontAxesMap[T] : string;
+`;
+}
+
+/**
  * Generate the fonts.ts file content
  */
 function generateFontsFile(fontFamilies: string[]): string {
   const sortedFamilies = [...fontFamilies].sort();
 
-  // Generate individual export statements
+  // Generate individual typed export statements
   const exports = sortedFamilies
     .map((fontFamily) => {
       const functionName = formatFontFunctionName(fontFamily);
 
-      // Check if identifier needs bracket notation
-      if (functionName.includes("_") || functionName.includes("-")) {
-        return `export const ${functionName} = fontFunctions["${functionName}"];`;
-      } else {
-        return `export const ${functionName} = fontFunctions.${functionName};`;
-      }
+      return `/**
+ * ${fontFamily} font with type-safe options
+ */
+export const ${functionName} = (
+  options?: GoogleFontOptions<
+    "${fontFamily}",
+    WeightsFor<"${fontFamily}">,
+    SubsetsFor<"${fontFamily}">,
+    StylesFor<"${fontFamily}">,
+    AxesFor<"${fontFamily}">
+  >
+): FontResult => createGoogleFont("${fontFamily}", options);`;
     })
-    .join("\n");
+    .join("\n\n");
 
-  return `import type { GoogleFontOptions, FontResult } from "../lib/core/types";
-import { createGoogleFont } from "./loader";
-import { formatFontFunctionName } from "../lib/core/font-loader";
-import { getAllFontFamilies } from "./metadata";
+  return `import type { FontResult } from "../lib/core/types.js";
+import type { GoogleFontOptions } from "../lib/core/google-font-options.js";
+import type { 
+  WeightsFor, 
+  SubsetsFor, 
+  StylesFor, 
+  AxesFor 
+} from "./font-families.js";
+import { createGoogleFont } from "./loader.js";
 
 /**
- * Generate individual font functions for all available Google Fonts
- * This creates functions like Inter(), Roboto(), etc.
+ * Type-safe Google Font functions
+ * Generated from font-data.json - DO NOT EDIT MANUALLY
+ * Run: pnpm generate:fonts to regenerate
+ * 
+ * Each function provides autocomplete for valid weights, subsets, styles, and axes
+ * specific to that font family.
  */
 
-// Get all available font families
-const fontFamilies = getAllFontFamilies();
-
-// Generate font functions dynamically
-const fontFunctions: Record<
-  string,
-  (options?: GoogleFontOptions) => FontResult
-> = {};
-
-for (const fontFamily of fontFamilies) {
-  const functionName = formatFontFunctionName(fontFamily);
-  fontFunctions[functionName] = (options?: GoogleFontOptions) =>
-    createGoogleFont(fontFamily, options);
-}
-
-// Export individual font functions
-// Generated from font-data.json - DO NOT EDIT MANUALLY
-// Run: pnpm generate:fonts to regenerate
 ${exports}
 
 // Export the service
@@ -113,6 +246,13 @@ function main() {
     const fontFamilies = Object.keys(fontData);
 
     console.log(`✅ Found ${fontFamilies.length} font families`);
+    console.log(`📝 Generating font families type...`);
+
+    // Generate font families type
+    const fontFamiliesContent =
+      generateFontFamiliesType(fontFamilies) + generatePerFontTypes(fontData);
+    fs.writeFileSync(FONT_FAMILIES_OUTPUT_PATH, fontFamiliesContent, "utf-8");
+
     console.log(`📝 Generating exports for fonts.ts...`);
 
     // Generate the file content
@@ -122,6 +262,7 @@ function main() {
     fs.writeFileSync(FONTS_OUTPUT_PATH, fileContent, "utf-8");
 
     console.log(`✅ Successfully generated ${FONTS_OUTPUT_PATH}`);
+    console.log(`✅ Successfully generated ${FONT_FAMILIES_OUTPUT_PATH}`);
     console.log(`📊 Exported ${fontFamilies.length} font functions`);
 
     // Show some examples

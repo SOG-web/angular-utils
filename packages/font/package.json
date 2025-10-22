@@ -1,6 +1,6 @@
 {
   "name": "@angular-utils/font",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Optimized font loading for Angular with SSR support",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,6 +17,10 @@
     "./local": {
       "types": "./dist/local/index.d.ts",
       "default": "./dist/local/index.js"
+    },
+    "./vite": {
+      "types": "./dist/lib/vite-plugin/index.d.ts",
+      "default": "./dist/lib/vite-plugin/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -42,6 +46,11 @@
     "@angular/common": ">=17.0.0",
     "@angular/core": ">=17.0.0"
   },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@angular-devkit/architect": "^0.2003.6",
     "@angular-devkit/core": "^20.3.6",
@@ -62,7 +71,8 @@
     "nock": "^13.5.0",
     "ts-jest": "^29.1.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vite": "^7.1.11"
   },
   "keywords": [
     "angular",
@@ -70,7 +80,9 @@
     "google-fonts",
     "ssr",
     "optimization",
-    "tailwind"
+    "tailwind",
+    "vite",
+    "analogjs"
   ],
   "license": "MIT",
   "repository": {

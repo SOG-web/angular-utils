@@ -9,6 +9,7 @@ export const inter = Inter({
   display: 'swap',
   variable: '--font-inter',
   preload: true,
+  styles: ['normal'],
 });
 
 export const roboto = Roboto({

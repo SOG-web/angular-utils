@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "pnpm font:optimize && ng build",
     "build:prod": "pnpm font:optimize && ng build --configuration production",
+    "build:gh-pages": "pnpm font:optimize && ng build --configuration production --base-href=/angular-utils/",
     "font:optimize": "ng run web:font-optimize",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

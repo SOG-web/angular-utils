@@ -1,4 +1,5 @@
 import fontData from "./font-data.json" with { type: "json" };
+import type { VariableFontAxes } from "../lib/core/types.js";
 
 /**
  * Find all font files in the CSS response and determine which files should be preloaded.
@@ -49,7 +50,8 @@ export function getGoogleFontsUrl(
     ital?: string[];
     variableAxes?: [string, string][];
   },
-  display: string
+  display: string,
+  baseUrl: string = "https://fonts.googleapis.com/css2"
 ): string {
   const params = new URLSearchParams();
 
@@ -76,7 +78,7 @@ export function getGoogleFontsUrl(
   // Add display
   params.set("display", display);
 
-  return `https://fonts.googleapis.com/css2?${params.toString()}`;
+  return `${baseUrl}?${params.toString()}`;
 }
 
 /**
@@ -87,7 +89,8 @@ export function getFontAxes(
   fontFamily: string,
   weights: string[],
   styles: string[],
-  selectedVariableAxes?: string[]
+  selectedVariableAxes?: string[],
+  customVariableAxes?: VariableFontAxes
 ): {
   wght?: string[];
   ital?: string[];
@@ -107,14 +110,24 @@ export function getFontAxes(
     if (metadata?.axes) {
       const wghtAxis = metadata.axes.find((axis: any) => axis.tag === "wght");
       if (wghtAxis) {
-        // Use the actual min..max range from metadata
-        axes.wght = [`${wghtAxis.min}..${wghtAxis.max}`];
+        // Use custom range if provided, otherwise use metadata range
+        if (customVariableAxes?.wght) {
+          axes.wght = [
+            `${customVariableAxes.wght[0]}..${customVariableAxes.wght[1]}`,
+          ];
+        } else {
+          axes.wght = [`${wghtAxis.min}..${wghtAxis.max}`];
+        }
       } else {
         // Fallback to default range
-        axes.wght = ["100..900"];
+        axes.wght = customVariableAxes?.wght
+          ? [`${customVariableAxes.wght[0]}..${customVariableAxes.wght[1]}`]
+          : ["100..900"];
       }
     } else {
-      axes.wght = ["100..900"];
+      axes.wght = customVariableAxes?.wght
+        ? [`${customVariableAxes.wght[0]}..${customVariableAxes.wght[1]}`]
+        : ["100..900"];
     }
   } else {
     axes.wght = weights;
@@ -127,7 +140,14 @@ export function getFontAxes(
   const hasNormal = styles.includes("normal");
 
   if (hasItalic) {
-    axes.ital = hasNormal ? ["0", "1"] : ["1"];
+    // Use custom slant range if provided
+    if (customVariableAxes?.slnt) {
+      axes.ital = [
+        `${customVariableAxes.slnt[0]}..${customVariableAxes.slnt[1]}`,
+      ];
+    } else {
+      axes.ital = hasNormal ? ["0", "1"] : ["1"];
+    }
   }
 
   // Handle additional variable axes
@@ -145,6 +165,15 @@ export function getFontAxes(
             (axis: any) => axis.tag === axisTag
           );
           if (axisData && axisData.tag !== "wght") {
+            // Use custom range if provided
+            const customRange =
+              customVariableAxes?.[axisData.tag as keyof VariableFontAxes];
+            if (customRange && Array.isArray(customRange)) {
+              return [axisData.tag, `${customRange[0]}..${customRange[1]}`] as [
+                string,
+                string,
+              ];
+            }
             return [axisData.tag, `${axisData.min}..${axisData.max}`] as [
               string,
               string,
@@ -153,6 +182,21 @@ export function getFontAxes(
           return null;
         })
         .filter((axis): axis is [string, string] => axis !== null);
+    }
+  }
+
+  // Add custom variable axes not in selectedVariableAxes
+  if (customVariableAxes && weights.includes("variable")) {
+    const customAxes: [string, string][] = [];
+
+    for (const [axisTag, range] of Object.entries(customVariableAxes)) {
+      if (Array.isArray(range) && axisTag !== "wght" && axisTag !== "slnt") {
+        customAxes.push([axisTag, `${range[0]}..${range[1]}`]);
+      }
+    }
+
+    if (customAxes.length > 0) {
+      axes.variableAxes = [...(axes.variableAxes || []), ...customAxes];
     }
   }
 

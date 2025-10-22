@@ -1,4 +1,5 @@
-import type { GoogleFontOptions, FontFile } from "../lib/core/types.js";
+import type { FontFile } from "../lib/core/types.js";
+import type { GoogleFontOptions } from "../lib/core/google-font-options.js";
 import {
   validateWeights,
   validateSubsets,
@@ -10,6 +11,9 @@ import {
   findFontFilesInCss,
 } from "./font-utils.js";
 import { generatePreloadLinks } from "../lib/core/css-generator.js";
+import { resolveCDNConfig } from "../lib/core/cdn-config.js";
+import { retryWithStrategy } from "../lib/core/retry.js";
+import { subsetGoogleFont } from "../lib/subsetting/google.js";
 
 /**
  * Build-time font loader for Angular CLI builder
@@ -34,16 +38,43 @@ export async function loadGoogleFontBuildTime(
   );
 
   // Validate options
-  const weights = validateWeights(fontFamily, options.weights || [400]);
-  const subsets = validateSubsets(fontFamily, options.subsets || ["latin"]);
-  const styles = validateStyles(fontFamily, options.styles || ["normal"]);
+  const weights = validateWeights(
+    fontFamily,
+    (options.weights || [400]) as number[] | "variable"
+  );
+  const subsets = validateSubsets(
+    fontFamily,
+    (options.subsets || ["latin"]) as string[]
+  );
+  const styles = validateStyles(
+    fontFamily,
+    (options.styles || ["normal"]) as string[]
+  );
 
-  // Generate Google Fonts URL
+  // Resolve CDN configuration
+  const cdnConfig = resolveCDNConfig(options.cdn);
+
+  // Generate Google Fonts URL with subsetting
   const axes = getFontAxes(fontFamily, weights, styles);
-  const url = getGoogleFontsUrl(fontFamily, axes, options.display || "swap");
+  let url = getGoogleFontsUrl(
+    fontFamily,
+    axes,
+    options.display || "swap",
+    cdnConfig.cssUrl
+  );
 
-  // Fetch CSS
-  const css = await fetchCSSFromGoogleFonts(url, fontFamily, false);
+  // Apply subsetting if specified
+  if (options.subset) {
+    url = subsetGoogleFont(fontFamily, url, options.subset);
+  }
+
+  // Fetch CSS with retry strategy
+  const css = await retryWithStrategy(
+    () => fetchCSSFromGoogleFonts(url, fontFamily, false),
+    options.retry,
+    options.onRetry,
+    options.onError
+  );
 
   // Find font files
   const fontFiles = findFontFilesInCss(css, subsets);
@@ -57,7 +88,13 @@ export async function loadGoogleFontBuildTime(
 
   for (const fontFile of fontFiles) {
     try {
-      const fontBuffer = await fetchFontFile(fontFile.googleFontFileUrl, false);
+      const fontBuffer = await retryWithStrategy(
+        () => fetchFontFile(fontFile.googleFontFileUrl, false),
+        options.retry,
+        options.onRetry,
+        options.onError
+      );
+
       const fileName = fontFile.googleFontFileUrl.split("/").pop()!;
       const filePath = path.join(fontDir, fileName);
 

@@ -1,4 +1,12 @@
-import type { GoogleFontOptions, FontResult } from "../lib/core/types.js";
+import type { FontResult } from "../lib/core/types.js";
+import { GoogleFontOptions } from "../lib/core/google-font-options.js";
+import type {
+  GoogleFontFamily,
+  WeightsFor,
+  SubsetsFor,
+  StylesFor,
+  AxesFor,
+} from "./font-families.js";
 import {
   validateWeights,
   validateSubsets,
@@ -12,16 +20,38 @@ import {
 } from "../lib/core/font-loader.js";
 
 /**
- * Create a Google Font configuration
+ * Create a Google Font configuration with strict typing
+ * Provides autocomplete for weights, subsets, styles, and axes based on the specific font family
  */
-export function createGoogleFont(
-  fontFamily: string,
-  options: GoogleFontOptions = {}
+export function createGoogleFont<T extends GoogleFontFamily>(
+  fontFamily: T,
+  options: GoogleFontOptions<
+    T,
+    WeightsFor<T>,
+    SubsetsFor<T>,
+    StylesFor<T>,
+    AxesFor<T>
+  > = {} as GoogleFontOptions<
+    T,
+    WeightsFor<T>,
+    SubsetsFor<T>,
+    StylesFor<T>,
+    AxesFor<T>
+  >
 ): FontResult {
   // Validate and normalize options
-  const weights = validateWeights(fontFamily, options.weights || [400]);
-  const subsets = validateSubsets(fontFamily, options.subsets || ["latin"]);
-  const styles = validateStyles(fontFamily, options.styles || ["normal"]);
+  const weights = validateWeights(
+    fontFamily,
+    (options.weights || [400]) as number[] | "variable"
+  );
+  const subsets = validateSubsets(
+    fontFamily,
+    (options.subsets || ["latin"]) as string[]
+  );
+  const styles = validateStyles(
+    fontFamily,
+    (options.styles || ["normal"]) as string[]
+  );
 
   const display = options.display || "swap";
   const preload = options.preload !== false;

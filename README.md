@@ -57,7 +57,7 @@ This monorepo uses [Turborepo](https://turborepo.com/) for efficient task manage
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/yourusername/angular-utils.git
+git clone https://github.com/SOG-web/angular-utils.git
 cd angular-utils
 ```
 
@@ -78,6 +78,8 @@ pnpm build
 ```bash
 pnpm dev --filter=web
 ```
+
+**Or try the live demo:** [https://sog-web.github.io/angular-utils/](https://sog-web.github.io/angular-utils/)
 
 ### Building
 

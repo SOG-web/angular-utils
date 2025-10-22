@@ -1,5 +1,7 @@
 import { Injectable, signal, computed } from "@angular/core";
-import type { GoogleFontOptions, FontResult } from "../lib/core/types.js";
+import type { FontResult } from "../lib/core/types.js";
+import type { GoogleFontOptions } from "../lib/core/google-font-options.js";
+import type { GoogleFontFamily } from "./font-families.js";
 import { createGoogleFont } from "./loader.js";
 
 /**
@@ -14,7 +16,16 @@ export class GoogleFontService {
   /**
    * Load a Google Font and return a signal with the result
    */
-  loadFont(fontFamily: string, options: GoogleFontOptions = {}) {
+  loadFont<T extends GoogleFontFamily>(
+    fontFamily: T,
+    options: GoogleFontOptions<T, any, any, any, any> = {} as GoogleFontOptions<
+      T,
+      any,
+      any,
+      any,
+      any
+    >
+  ) {
     const cacheKey = `${fontFamily}:${JSON.stringify(options)}`;
 
     // Check if already loaded
@@ -55,7 +66,10 @@ export class GoogleFontService {
    * Preload multiple fonts
    */
   async preloadFonts(
-    fontConfigs: Array<{ family: string; options?: GoogleFontOptions }>
+    fontConfigs: Array<{
+      family: GoogleFontFamily;
+      options?: GoogleFontOptions<any, any, any, any, any>;
+    }>
   ) {
     const promises = fontConfigs.map(({ family, options }) =>
       this.loadFont(family, options)
