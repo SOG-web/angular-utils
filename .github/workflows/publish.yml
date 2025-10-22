@@ -57,14 +57,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create Release
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: pnpm changeset publish
-          version: pnpm changeset version
-          commit: "chore: release packages"
-          title: "chore: release packages"
+      - name: Version packages
+        run: pnpm changeset version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish packages
+        run: pnpm changeset publish
+        env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
