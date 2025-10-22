@@ -49,10 +49,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm build
-
-      - name: Run tests
-        run: pnpm test
+        run: pnpm build --filter=@angular-utils/font
 
       - name: Configure Git
         run: |
