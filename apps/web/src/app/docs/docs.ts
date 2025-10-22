@@ -11,18 +11,24 @@ import { RouterModule } from '@angular/router';
 })
 export class DocsComponent {
   // Quick Start examples
-  quickStartExample = `// fonts.ts
-import { Inter } from '@angular-utils/font/google';
+  quickStartExample = `// 1. Install package
+npm install @angular-utils/font
+
+// 2. Declare fonts in src/fonts.ts
+import { Inter, Roboto_Mono } from '@angular-utils/font/google';
 
 export const inter = Inter({
   weights: [400, 700],
   subsets: ['latin'],
   variable: '--font-inter',
-  preload: true,
-});`;
+});
+
+// 3. Configure angular.json (see Build-time Optimization section)
+// 4. Run: ng run my-app:font-optimize
+// 5. Use in components (see Component Usage section)`;
 
   // Common Patterns examples
-  basicGoogleFontExample = `// fonts.ts
+  basicGoogleFontExample = `// src/fonts.ts
 import { Inter } from '@angular-utils/font/google';
 
 export const inter = Inter({
@@ -33,7 +39,7 @@ export const inter = Inter({
   preload: true,
 });`;
 
-  multipleFontsExample = `// fonts.ts
+  multipleFontsExample = `// src/fonts.ts
 import { Inter, Playfair_Display } from '@angular-utils/font/google';
 
 export const inter = Inter({
@@ -56,19 +62,51 @@ export const playfairDisplay = Playfair_Display({
   --font-family-serif: var(--font-playfair-display), serif;
 }`;
 
-  localFontsExample = `// fonts.ts
+  localFontsExample = `// src/fonts.ts
 import { localFont } from '@angular-utils/font/local';
 
 export const rubikFamily = localFont({
   src: [
-    { path: './static/Rubik-Regular.ttf', weight: '400', style: 'normal' },
-    { path: './static/Rubik-Bold.ttf', weight: '700', style: 'normal' },
-    { path: './static/Rubik-Italic.ttf', weight: '400', style: 'italic' },
+    { path: './src/static/Rubik-Regular.ttf', weight: '400', style: 'normal' },
+    { path: './src/static/Rubik-Bold.ttf', weight: '700', style: 'normal' },
+    { path: './src/static/Rubik-Italic.ttf', weight: '400', style: 'italic' },
   ],
   variable: '--font-rubik',
   display: 'swap',
   preload: true,
 });`;
+
+  componentUsageExample = `// font-demo.component.ts
+import { Component, signal } from '@angular/core';
+import { inter, playfairDisplay } from '../fonts';
+
+@Component({
+  selector: 'app-font-demo',
+  template: \`
+    <div [style]="currentFontStyle()">
+      <h1>{{ heading }}</h1>
+      <p>{{ paragraph }}</p>
+    </div>
+  \`,
+  host: {
+    '[class]': 'fontClasses',
+  },
+})
+export class FontDemoComponent {
+  protected readonly selectedFont = signal(inter);
+  protected readonly heading = 'The Quick Brown Fox';
+  protected readonly paragraph = 'Typography is the art...';
+  
+  protected readonly currentFontStyle = computed(() => ({
+    fontFamily: this.selectedFont().style.fontFamily,
+    fontWeight: 400,
+  }));
+  
+  protected readonly fontClasses = [
+    inter.className,
+    playfairDisplay.className,
+  ].join(' ');
+}`;
 
   buildTimeOptimizationExample = `// angular.json
 {
@@ -87,6 +125,14 @@ export const rubikFamily = localFont({
         }
       }
     }
+  }
+}
+
+// package.json
+{
+  "scripts": {
+    "build": "ng run my-app:font-optimize && ng build",
+    "font:optimize": "ng run my-app:font-optimize"
   }
 }`;
 

@@ -28,15 +28,25 @@ yarn add @angular-utils/font
 
 ## Quick Start
 
-### 1. Google Fonts
+### 1. Install the package
+
+```bash
+npm install @angular-utils/font
+# or
+pnpm add @angular-utils/font
+# or
+yarn add @angular-utils/font
+```
+
+### 2. Declare fonts in `src/fonts.ts`
 
 ```typescript
-// fonts.ts
+// src/fonts.ts
 import { Inter, Roboto_Mono } from "@angular-utils/font/google";
 
 export const inter = Inter({
-  subsets: ["latin"],
   weights: [400, 700],
+  subsets: ["latin"],
   variable: "--font-inter",
 });
 
@@ -45,6 +55,40 @@ export const robotoMono = Roboto_Mono({
   variable: "--font-roboto-mono",
 });
 ```
+
+### 3. Configure Angular CLI builder
+
+```json
+// angular.json
+{
+  "projects": {
+    "my-app": {
+      "architect": {
+        "font-optimize": {
+          "builder": "@angular-utils/font:optimize",
+          "options": {
+            "outputPath": "dist",
+            "projectRoot": "",
+            "sourceRoot": "src",
+            "fontFile": "src/fonts.ts",
+            "injectTailwind": "v4"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### 4. Run font optimization
+
+```bash
+ng run my-app:font-optimize
+# or add to your build script
+npm run build  # includes font optimization
+```
+
+### 5. Use fonts in components
 
 ```typescript
 // app.component.ts
@@ -62,7 +106,7 @@ import { inter, robotoMono } from "./fonts";
   },
 })
 export class AppComponent {
-  fontClasses = `${inter.variable} ${robotoMono.variable}`;
+  fontClasses = `${inter.className} ${robotoMono.className}`;
 }
 ```
 

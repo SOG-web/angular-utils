@@ -22,6 +22,7 @@
         <nav class="space-y-1 sticky top-8">
           <a href="#quick-start" class="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">Quick Start</a>
           <a href="#common-patterns" class="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">Common Patterns</a>
+          <a href="#build-time-optimization" class="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">Build-time Optimization</a>
           <a href="#advanced-features" class="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">Advanced Features</a>
           <a href="#api-reference" class="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">API Reference</a>
           <a href="#helper-utilities" class="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">Helper Utilities</a>
@@ -35,38 +36,18 @@
           <h2 class="text-2xl font-bold text-gray-900 mb-6">Quick Start</h2>
           
           <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Installation</h3>
-            <div class="bg-gray-900 rounded-lg p-4 mb-4">
-              <code class="text-green-400">npm install @angular-utils/font</code>
-            </div>
-            <p class="text-gray-600 mb-4">Or with pnpm:</p>
-            <div class="bg-gray-900 rounded-lg p-4">
-              <code class="text-green-400">pnpm add @angular-utils/font</code>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Example</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Complete Workflow</h3>
             <div class="bg-gray-900 rounded-lg p-4 mb-4">
               <pre class="text-gray-300"><code>{{ quickStartExample }}</code></pre>
             </div>
             <button (click)="copyToClipboard(quickStartExample)" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
               Copy Code
             </button>
-          </div>
-
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="ml-3">
-                <p class="text-sm text-blue-700">
-                  <strong>Expected Output:</strong> Font files downloaded and self-hosted, CSS variables generated, Tailwind integration ready.
-                </p>
-              </div>
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+              <p class="text-sm text-blue-800">
+                <strong>💡 Tip:</strong> This shows the complete workflow from installation to usage. 
+                See the <a href="#build-time-optimization" class="text-blue-600 underline">Build-time Optimization</a> section for detailed configuration.
+              </p>
             </div>
           </div>
         </section>
@@ -145,9 +126,31 @@
             </div>
           </div>
 
-          <!-- Pattern 5: Build-time Optimization -->
+          <!-- Pattern 5: Component Usage -->
           <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Pattern 5: Build-time Optimization</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Pattern 5: Component Usage</h3>
+            <div class="bg-gray-900 rounded-lg p-4 mb-4">
+              <pre class="text-gray-300"><code>{{ componentUsageExample }}</code></pre>
+            </div>
+            <button (click)="copyToClipboard(componentUsageExample)" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 mb-4">
+              Copy Code
+            </button>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <p class="text-sm text-gray-600 mb-2"><strong>Live Demo:</strong></p>
+              <div class="space-y-2">
+                <div class="font-[var(--font-inter)] text-lg font-normal">Inter: Clean and modern sans-serif</div>
+                <div class="font-[var(--font-playfair-display)] text-lg font-normal">Playfair Display: Elegant serif for headings</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Build-time Optimization Section -->
+        <section id="build-time-optimization" class="mb-12">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Build-time Optimization</h2>
+
+          <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Angular CLI Configuration</h3>
             <div class="bg-gray-900 rounded-lg p-4 mb-4">
               <pre class="text-gray-300"><code>{{ buildTimeOptimizationExample }}</code></pre>
             </div>
