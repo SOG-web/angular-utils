@@ -1,5 +1,5 @@
 ---
-"@angular-utils/font": patch
+"@sog-web/angular-utils-font": patch
 ---
 
 deploy

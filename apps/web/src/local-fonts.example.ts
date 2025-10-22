@@ -1,11 +1,11 @@
 /**
- * Example: Using local fonts with the @angular-utils/font package
+ * Example: Using local fonts with the @sog-web/angular-utils-font package
  *
  * This file demonstrates how to use local font files (like the Rubik fonts in static/)
  * with automatic fallback metrics generation for zero layout shift.
  */
 
-import { localFont } from '@angular-utils/font/local';
+import { localFont } from '@sog-web/angular-utils-font/local';
 
 // Example 1: Single font file
 export const rubikRegular = localFont({

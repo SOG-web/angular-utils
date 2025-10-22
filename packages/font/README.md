@@ -1,4 +1,4 @@
-# @angular-utils/font
+# @sog-web/angular-utils-font
 
 Optimized font loading for Angular with SSR support, inspired by `@next/font`.
 
@@ -19,11 +19,11 @@ Optimized font loading for Angular with SSR support, inspired by `@next/font`.
 ## Installation
 
 ```bash
-npm install @angular-utils/font
+npm install @sog-web/angular-utils-font
 # or
-pnpm add @angular-utils/font
+pnpm add @sog-web/angular-utils-font
 # or
-yarn add @angular-utils/font
+yarn add @sog-web/angular-utils-font
 ```
 
 ## Quick Start
@@ -31,18 +31,18 @@ yarn add @angular-utils/font
 ### 1. Install the package
 
 ```bash
-npm install @angular-utils/font
+npm install @sog-web/angular-utils-font
 # or
-pnpm add @angular-utils/font
+pnpm add @sog-web/angular-utils-font
 # or
-yarn add @angular-utils/font
+yarn add @sog-web/angular-utils-font
 ```
 
 ### 2. Declare fonts in `src/fonts.ts`
 
 ```typescript
 // src/fonts.ts
-import { Inter, Roboto_Mono } from "@angular-utils/font/google";
+import { Inter, Roboto_Mono } from "@sog-web/angular-utils-font/google";
 
 export const inter = Inter({
   weights: [400, 700],
@@ -65,7 +65,7 @@ export const robotoMono = Roboto_Mono({
     "my-app": {
       "architect": {
         "font-optimize": {
-          "builder": "@angular-utils/font:optimize",
+          "builder": "@sog-web/angular-utils-font:optimize",
           "options": {
             "outputPath": "dist",
             "projectRoot": "",
@@ -114,7 +114,7 @@ export class AppComponent {
 
 ```typescript
 // fonts.ts
-import { localFont } from "@angular-utils/font/local";
+import { localFont } from "@sog-web/angular-utils-font/local";
 
 // Single font file
 export const customFont = localFont({
@@ -141,7 +141,7 @@ export const rubikFamily = localFont({
 
 ```typescript
 // fonts.ts
-import { Inter } from "@angular-utils/font/google";
+import { Inter } from "@sog-web/angular-utils-font/google";
 
 // Subset by specific text
 export const interSubset = Inter({
@@ -164,7 +164,7 @@ export const interRange = Inter({
 });
 
 // Use helper for common character sets
-import { COMMON_CHARACTER_SETS } from "@angular-utils/font/google";
+import { COMMON_CHARACTER_SETS } from "@sog-web/angular-utils-font/google";
 
 export const interBasic = Inter({
   weights: [400, 700],
@@ -180,7 +180,7 @@ export const interBasic = Inter({
 
 ```typescript
 // fonts.ts
-import { Inter } from "@angular-utils/font/google";
+import { Inter } from "@sog-web/angular-utils-font/google";
 
 // Basic variable font
 export const interVariable = Inter({
@@ -218,7 +218,7 @@ export const interAdvanced = Inter({
 
 ```typescript
 // fonts.ts
-import { Inter } from "@angular-utils/font/google";
+import { Inter } from "@sog-web/angular-utils-font/google";
 
 // Use custom CDN for self-hosting
 export const interCDN = Inter({
@@ -236,7 +236,7 @@ export const interCDN = Inter({
 
 ```typescript
 // fonts.ts
-import { Inter } from "@angular-utils/font/google";
+import { Inter } from "@sog-web/angular-utils-font/google";
 
 export const interResilient = Inter({
   weights: [400, 700],
@@ -320,7 +320,7 @@ The font scanner looks for a **single `fonts.ts` file** where all fonts are decl
     "my-app": {
       "architect": {
         "font-optimize": {
-          "builder": "@angular-utils/font:optimize",
+          "builder": "@sog-web/angular-utils-font:optimize",
           "options": {
             "outputPath": "public",
             "projectRoot": "",
@@ -358,7 +358,7 @@ For dynamic font loading, use the services:
 
 ```typescript
 import { Component, inject } from "@angular/core";
-import { GoogleFontService } from "@angular-utils/font/google";
+import { GoogleFontService } from "@sog-web/angular-utils-font/google";
 
 @Component({
   selector: "app-dynamic",
@@ -382,7 +382,7 @@ export class DynamicComponent {
 
 ```typescript
 import { Component, inject } from "@angular/core";
-import { LocalFontService } from "@angular-utils/font/local";
+import { LocalFontService } from "@sog-web/angular-utils-font/local";
 
 @Component({
   selector: "app-local",
@@ -414,7 +414,7 @@ ng add @angular/ssr
 // server.ts
 import { bootstrapApplication } from "@angular/platform-browser";
 import { AppComponent } from "./app/app.component";
-import { injectFontPreloads } from "@angular-utils/font/ssr";
+import { injectFontPreloads } from "@sog-web/angular-utils-font/ssr";
 
 export function app(): string {
   const html = bootstrapApplication(AppComponent, {
@@ -625,7 +625,7 @@ import {
   Noto_Sans,
   Noto_Serif,
   // ... and many more!
-} from "@angular-utils/font/google";
+} from "@sog-web/angular-utils-font/google";
 ```
 
 ## Fallback Font Metrics (Zero Layout Shift)
@@ -718,7 +718,7 @@ This ensures the fallback font is used while the web font loads, minimizing layo
 For font subsetting, use predefined character sets:
 
 ```typescript
-import { COMMON_CHARACTER_SETS } from "@angular-utils/font/google";
+import { COMMON_CHARACTER_SETS } from "@sog-web/angular-utils-font/google";
 
 // Basic Latin characters (A-Z, a-z, 0-9, basic punctuation)
 COMMON_CHARACTER_SETS.basicLatin;
@@ -740,7 +740,7 @@ COMMON_CHARACTER_SETS.punctuation;
 ### Subsetting Helpers
 
 ```typescript
-import { extractUniqueCharacters } from "@angular-utils/font/google";
+import { extractUniqueCharacters } from "@sog-web/angular-utils-font/google";
 
 // Extract unique characters from text
 const uniqueChars = extractUniqueCharacters("Hello World!");

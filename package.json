@@ -10,7 +10,7 @@
     "test": "turbo run test",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build --filter=!@angular-utils/font && changeset publish"
+    "release": "turbo run build --filter=!@sog-web/angular-utils-font && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",

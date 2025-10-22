@@ -1,7 +1,13 @@
 // Font declarations for build-time optimization
 // The Angular builder will scan this file and download fonts at build time
-import { Inter, Roboto, Open_Sans, Poppins, Playfair_Display } from '@angular-utils/font/google';
-import { localFont } from '@angular-utils/font/local';
+import {
+  Inter,
+  Roboto,
+  Open_Sans,
+  Poppins,
+  Playfair_Display,
+} from '@sog-web/angular-utils-font/google';
+import { localFont } from '@sog-web/angular-utils-font/local';
 
 export const inter = Inter({
   weights: [300, 400, 500, 600, 700, 900],

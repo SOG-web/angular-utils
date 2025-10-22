@@ -12,10 +12,10 @@ import { RouterModule } from '@angular/router';
 export class DocsComponent {
   // Quick Start examples
   quickStartExample = `// 1. Install package
-npm install @angular-utils/font
+npm install @sog-web/angular-utils-font
 
 // 2. Declare fonts in src/fonts.ts
-import { Inter, Roboto_Mono } from '@angular-utils/font/google';
+import { Inter, Roboto_Mono } from '@sog-web/angular-utils-font/google';
 
 export const inter = Inter({
   weights: [400, 700],
@@ -29,7 +29,7 @@ export const inter = Inter({
 
   // Common Patterns examples
   basicGoogleFontExample = `// src/fonts.ts
-import { Inter } from '@angular-utils/font/google';
+import { Inter } from '@sog-web/angular-utils-font/google';
 
 export const inter = Inter({
   weights: [400, 700],
@@ -40,7 +40,7 @@ export const inter = Inter({
 });`;
 
   multipleFontsExample = `// src/fonts.ts
-import { Inter, Playfair_Display } from '@angular-utils/font/google';
+import { Inter, Playfair_Display } from '@sog-web/angular-utils-font/google';
 
 export const inter = Inter({
   weights: [400, 700],
@@ -63,7 +63,7 @@ export const playfairDisplay = Playfair_Display({
 }`;
 
   localFontsExample = `// src/fonts.ts
-import { localFont } from '@angular-utils/font/local';
+import { localFont } from '@sog-web/angular-utils-font/local';
 
 export const rubikFamily = localFont({
   src: [
@@ -114,7 +114,7 @@ export class FontDemoComponent {
     "my-app": {
       "architect": {
         "font-optimize": {
-          "builder": "@angular-utils/font:optimize",
+          "builder": "@sog-web/angular-utils-font:optimize",
           "options": {
             "outputPath": "dist",
             "projectRoot": "",
@@ -138,8 +138,8 @@ export class FontDemoComponent {
 
   // Advanced Features examples
   fontSubsettingExample = `// fonts.ts
-import { Inter } from '@angular-utils/font/google';
-import { COMMON_CHARACTER_SETS } from '@angular-utils/font/google';
+import { Inter } from '@sog-web/angular-utils-font/google';
+import { COMMON_CHARACTER_SETS } from '@sog-web/angular-utils-font/google';
 
 // Subset by specific text
 export const interSubset = Inter({
@@ -162,7 +162,7 @@ export const interBasic = Inter({
 });`;
 
   variableFontsExample = `// fonts.ts
-import { Inter } from '@angular-utils/font/google';
+import { Inter } from '@sog-web/angular-utils-font/google';
 
 // Basic variable font
 export const interVariable = Inter({
@@ -184,7 +184,7 @@ export const interCustomAxes = Inter({
 });`;
 
   cdnConfigExample = `// fonts.ts
-import { Inter } from '@angular-utils/font/google';
+import { Inter } from '@sog-web/angular-utils-font/google';
 
 export const interCDN = Inter({
   weights: [400, 700],
@@ -197,7 +197,7 @@ export const interCDN = Inter({
 });`;
 
   retryErrorHandlingExample = `// fonts.ts
-import { Inter } from '@angular-utils/font/google';
+import { Inter } from '@sog-web/angular-utils-font/google';
 
 export const interResilient = Inter({
   weights: [400, 700],
@@ -265,7 +265,7 @@ export const interResilient = Inter({
 }`;
 
   // Helper utilities
-  commonCharacterSetsExample = `import { COMMON_CHARACTER_SETS } from '@angular-utils/font/google';
+  commonCharacterSetsExample = `import { COMMON_CHARACTER_SETS } from '@sog-web/angular-utils-font/google';
 
 // Basic Latin characters (A-Z, a-z, 0-9, basic punctuation)
 COMMON_CHARACTER_SETS.basicLatin
@@ -283,7 +283,7 @@ COMMON_CHARACTER_SETS.numbers
 COMMON_CHARACTER_SETS.punctuation
 // '.,!?;:'"()[]{}/\\-_=+*&^%$#@~\`|<>'`;
 
-  subsettingHelpersExample = `import { extractUniqueCharacters } from '@angular-utils/font/google';
+  subsettingHelpersExample = `import { extractUniqueCharacters } from '@sog-web/angular-utils-font/google';
 
 // Extract unique characters from text
 const uniqueChars = extractUniqueCharacters('Hello World!');

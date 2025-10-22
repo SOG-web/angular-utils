@@ -11,7 +11,7 @@
       "prefix": "app",
       "architect": {
         "font-optimize": {
-          "builder": "@angular-utils/font:optimize",
+          "builder": "@sog-web/angular-utils-font:optimize",
           "options": {
             "outputPath": "public",
             "projectRoot": "",
@@ -32,7 +32,7 @@
               },
               {
                 "glob": "**/*",
-                "input": "node_modules/@angular-utils/font/dist/assets",
+                "input": "node_modules/@sog-web/angular-utils-font/dist/assets",
                 "output": "assets/fonts"
               }
             ],

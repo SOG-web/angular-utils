@@ -1,6 +1,6 @@
 # Font Showcase Web App
 
-An interactive demonstration of `@angular-utils/font` - optimized font loading for Angular with build-time optimization and SSR support.
+An interactive demonstration of `@sog-web/angular-utils-font` - optimized font loading for Angular with build-time optimization and SSR support.
 
 This project showcases multiple Google Fonts with different weights, interactive font switching, and demonstrates both runtime and build-time font optimization patterns.
 
@@ -31,7 +31,7 @@ Visit the **[Documentation Page](/docs)** for:
 Fonts are declared in `src/fonts.ts` using the static import pattern:
 
 ```typescript
-import { Inter, Roboto } from '@angular-utils/font/google';
+import { Inter, Roboto } from '@sog-web/angular-utils-font/google';
 
 export const inter = Inter({
   weights: [300, 400, 500, 600, 700, 900],

@@ -8,8 +8,8 @@
  * during the build process.
  */
 
-import { Inter, Roboto_Mono, Playfair_Display } from '@angular-utils/font/google';
-import { localFont } from '@angular-utils/font/local';
+import { Inter, Roboto_Mono, Playfair_Display } from '@sog-web/angular-utils-font/google';
+import { localFont } from '@sog-web/angular-utils-font/local';
 
 /**
  * Primary font: Inter

@@ -1,6 +1,6 @@
 # Font Generation Scripts
 
-This directory contains build-time scripts for the `@angular-utils/font` package.
+This directory contains build-time scripts for the `@sog-web/angular-utils-font` package.
 
 ## generate-font-exports.ts
 
@@ -95,7 +95,7 @@ To add new fonts to the package:
 
 ```typescript
 // After adding "NewFont" to font-data.json
-import { NewFont } from "@angular-utils/font/google";
+import { NewFont } from "@sog-web/angular-utils-font/google";
 
 const newFont = NewFont({ weights: [400, 700] });
 ```

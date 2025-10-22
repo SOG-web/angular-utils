@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="text-center mb-12">
       <h1 class="text-5xl font-bold text-gray-900 mb-4">
-        @angular-utils/font
+        @sog-web/angular-utils-font
       </h1>
       <p class="text-xl text-gray-600 max-w-2xl mx-auto">
         Optimized font loading for Angular with SSR support. Experience real-time font switching with Google Fonts.
@@ -153,7 +153,7 @@
       <div class="mt-6 p-6 bg-gray-900 rounded-lg overflow-x-auto">
         @if (selectedFont().name !== 'Rubik') {
           <pre class="text-sm text-gray-100"><code>// Google Font
-import &#123; {{ selectedFont().name.replace(' ', '_') }} &#125; from '@angular-utils/font/google';
+import &#123; {{ selectedFont().name.replace(' ', '_') }} &#125; from '@sog-web/angular-utils-font/google';
 
 export const {{ selectedFont().name.toLowerCase().replace(' ', '') }} = {{ selectedFont().name.replace(' ', '_') }}(&#123;
   weights: [{{ weights.join(', ') }}],
@@ -164,7 +164,7 @@ export const {{ selectedFont().name.toLowerCase().replace(' ', '') }} = {{ selec
 &#125;);</code></pre>
         } @else {
           <pre class="text-sm text-gray-100"><code>// Local Font
-import &#123; localFont &#125; from '@angular-utils/font/local';
+import &#123; localFont &#125; from '@sog-web/angular-utils-font/local';
 
 export const rubikFamily = localFont(&#123;
   src: [
@@ -184,7 +184,7 @@ export const rubikFamily = localFont(&#123;
 
     <!-- Footer -->
     <footer class="text-center mt-12 text-gray-600">
-      <p class="mb-2">Built with Angular 20 + @angular-utils/font</p>
+      <p class="mb-2">Built with Angular 20 + @sog-web/angular-utils-font</p>
       <p class="text-sm">
         <a href="https://github.com/SOG-web/angular-utils" class="text-indigo-600 hover:text-indigo-700 transition-colors">
           View on GitHub

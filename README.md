@@ -4,7 +4,7 @@ A collection of utilities and packages for Angular applications.
 
 ## Packages
 
-### [@angular-utils/font](./packages/font)
+### [@sog-web/angular-utils-font](./packages/font)
 
 Optimized font loading for Angular with SSR support, inspired by `@next/font`.
 
@@ -21,9 +21,9 @@ Optimized font loading for Angular with SSR support, inspired by `@next/font`.
 **Installation:**
 
 ```bash
-npm install @angular-utils/font
+npm install @sog-web/angular-utils-font
 # or
-pnpm add @angular-utils/font
+pnpm add @sog-web/angular-utils-font
 ```
 
 See the [font package documentation](./packages/font/README.md) for detailed usage.
@@ -92,7 +92,7 @@ pnpm build
 Build a specific package:
 
 ```bash
-pnpm build --filter=@angular-utils/font
+pnpm build --filter=@sog-web/angular-utils-font
 ```
 
 ### Testing
@@ -106,7 +106,7 @@ pnpm test
 Run tests for a specific package:
 
 ```bash
-pnpm test --filter=@angular-utils/font
+pnpm test --filter=@sog-web/angular-utils-font
 ```
 
 ### Development Workflow
@@ -149,4 +149,4 @@ MIT License - see individual package LICENSE files for details.
 - [Angular Documentation](https://angular.dev/)
 - [Turborepo Documentation](https://turborepo.com/)
 - [pnpm Documentation](https://pnpm.io/)
-- [@angular-utils/font Package](./packages/font/README.md)
+- [@sog-web/angular-utils-font Package](./packages/font/README.md)

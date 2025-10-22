@@ -91,7 +91,7 @@ The demo app shows:
 ### 1. Update src/fonts.ts
 
 ```typescript
-import { Lato } from '@angular-utils/font/google';
+import { Lato } from '@sog-web/angular-utils-font/google';
 
 export const lato = Lato({
   weights: [400, 700],
