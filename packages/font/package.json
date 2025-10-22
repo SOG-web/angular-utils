@@ -1,6 +1,6 @@
 {
   "name": "angular-fonts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Optimized font loading for Angular with SSR support",
   "type": "module",
   "main": "./dist/index.js",
@@ -53,11 +53,11 @@
     }
   },
   "dependencies": {
-    "@angular-devkit/architect": "^0.2003.6",
-    "@angular-devkit/core": "^20.3.6",
     "fontkit": "2.0.2"
   },
   "devDependencies": {
+    "@angular-devkit/architect": "^0.2003.6",
+    "@angular-devkit/core": "^20.3.6",
     "@angular/common": "^20.0.0",
     "@angular/core": "^20.0.0",
     "@angular/platform-browser": "^20.0.0",
