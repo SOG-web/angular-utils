@@ -59,7 +59,7 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/angular-utils/"
+              "baseHref": "/"
             },
             "development": {
               "optimization": false,
