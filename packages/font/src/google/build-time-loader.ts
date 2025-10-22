@@ -56,7 +56,13 @@ export async function loadGoogleFontBuildTime(
   const cdnConfig = resolveCDNConfig(options.cdn);
 
   // Generate Google Fonts URL with subsetting
-  const axes = getFontAxes(fontFamily, weights, styles);
+  const axes = getFontAxes(
+    fontFamily,
+    weights,
+    styles,
+    options.axes,
+    options.variableAxes
+  );
   let url = getGoogleFontsUrl(
     fontFamily,
     axes,
@@ -128,6 +134,27 @@ export async function loadGoogleFontBuildTime(
       fontFile.googleFontFileUrl,
       localPath
     );
+  }
+
+  // Add display strategy if specified
+  if (options.displayStrategy) {
+    const strategy = options.displayStrategy;
+    const comments: string[] = [];
+
+    if (strategy.blockPeriod !== undefined) {
+      comments.push(`/* block-period: ${strategy.blockPeriod}ms */`);
+    }
+    if (strategy.swapPeriod !== undefined) {
+      comments.push(`/* swap-period: ${strategy.swapPeriod}ms */`);
+    }
+    if (strategy.failurePeriod !== undefined) {
+      comments.push(`/* failure-period: ${strategy.failurePeriod}ms */`);
+    }
+
+    if (comments.length > 0) {
+      const strategyComment = `\n/* Font Display Strategy */\n${comments.join("\n")}\n/* Note: Timing values require JavaScript FontFace API for implementation */\n`;
+      optimizedCSS = strategyComment + optimizedCSS;
+    }
   }
 
   // Add fallback font metrics if enabled (default: true)

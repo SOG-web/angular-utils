@@ -1,4 +1,9 @@
 import type { FontImport } from "./types.js";
+import {
+  scanCreateGoogleFontPattern,
+  scanLocalFontImports as scanLocalFontImportsCore,
+  type FontImportBase,
+} from "../core/font-scanner-core.js";
 
 /**
  * Scan TypeScript file for font imports
@@ -8,7 +13,6 @@ export async function scanForFontImports(
   fontsFile: string
 ): Promise<FontImport[]> {
   const fs = await import("node:fs");
-  const path = await import("node:path");
 
   try {
     // Check if fonts file exists
@@ -20,76 +24,22 @@ export async function scanForFontImports(
     const content = fs.readFileSync(fontsFile, "utf8");
     const fontImports: FontImport[] = [];
 
-    // Parse Google Font imports
-    const googleFontRegex =
-      /createGoogleFont\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*(\{[^}]*\})\s*\)/g;
-    let match;
+    // Scan for Google Font imports using createGoogleFont() pattern
+    const googleFontImports = scanCreateGoogleFontPattern(content, fontsFile, {
+      includeMetadata: false,
+      validateGoogleFonts: true,
+    }) as FontImportBase[];
+    fontImports.push(...googleFontImports);
 
-    while ((match = googleFontRegex.exec(content)) !== null) {
-      const [, fontFamily, optionsStr] = match;
-
-      try {
-        // Parse options (simple JSON parsing)
-        const options = JSON.parse(optionsStr);
-
-        fontImports.push({
-          type: "google",
-          family: fontFamily,
-          options,
-        });
-      } catch (error) {
-        console.warn(`Failed to parse options for ${fontFamily}:`, error);
-      }
-    }
-
-    // Parse local font imports
-    const localFontRegex = /localFont\s*\(\s*(\{[^}]*\})\s*\)/g;
-
-    while ((match = localFontRegex.exec(content)) !== null) {
-      const [, optionsStr] = match;
-
-      try {
-        const options = JSON.parse(optionsStr);
-
-        // Extract font family from src path or variable name
-        const family = extractFontFamilyFromOptions(options);
-
-        fontImports.push({
-          type: "local",
-          family,
-          options,
-        });
-      } catch (error) {
-        console.warn("Failed to parse local font options:", error);
-      }
-    }
+    // Scan for local font imports
+    const localFontImports = scanLocalFontImportsCore(content, fontsFile, {
+      includeMetadata: false,
+    }) as FontImportBase[];
+    fontImports.push(...localFontImports);
 
     return fontImports;
   } catch (error) {
     console.error("Failed to scan font imports:", error);
     return [];
   }
-}
-
-/**
- * Extract font family name from local font options
- */
-function extractFontFamilyFromOptions(options: any): string {
-  // Try to get from variable name
-  if (options.variable) {
-    return options.variable.replace("--font-", "").replace(/-/g, " ");
-  }
-
-  // Try to get from src path
-  if (options.src) {
-    if (typeof options.src === "string") {
-      const filename = options.src.split("/").pop()?.split(".")[0];
-      return filename || "custom-font";
-    } else if (Array.isArray(options.src) && options.src.length > 0) {
-      const filename = options.src[0].path.split("/").pop()?.split(".")[0];
-      return filename || "custom-font";
-    }
-  }
-
-  return "custom-font";
 }

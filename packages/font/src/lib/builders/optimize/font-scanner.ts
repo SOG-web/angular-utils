@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isFontAvailable } from "../../../google/metadata.js";
+import {
+  scanDirectFunctionPattern,
+  scanLocalFontImports as scanLocalFontImportsCore,
+  type FontImportWithMetadata,
+} from "../../core/font-scanner-core.js";
 
 export interface FontImport {
   type: "google" | "local";
@@ -76,180 +80,21 @@ export async function scanForFontImports(
       `Scanning font declarations in: ${path.relative(projectRoot, filePath)}`
     );
 
-    // Scan for Google Font imports
-    const googleFontImports = scanForGoogleFontImports(content, filePath);
+    // Scan for Google Font imports using direct function pattern
+    const googleFontImports = scanDirectFunctionPattern(content, filePath, {
+      includeMetadata: true,
+      validateGoogleFonts: true,
+    }) as FontImportWithMetadata[];
     fontImports.push(...googleFontImports);
     console.info(`  Found ${googleFontImports.length} Google Font import(s)`);
 
     // Scan for local font imports
-    const localFontImports = scanForLocalFontImports(content, filePath);
+    const localFontImports = scanLocalFontImportsCore(content, filePath, {
+      includeMetadata: true,
+    }) as FontImportWithMetadata[];
     fontImports.push(...localFontImports);
     console.info(`  Found ${localFontImports.length} local font import(s)`);
   }
 
   return fontImports;
-}
-
-/**
- * Scan for Google Font imports like Inter({ weights: [400, 700] })
- */
-function scanForGoogleFontImports(
-  content: string,
-  filePath: string
-): FontImport[] {
-  const imports: FontImport[] = [];
-
-  // Pattern to match font function calls (can span multiple lines)
-  const fontFunctionPattern = /(\w+)\s*\(\s*\{([^}]*)\}\s*\)/g;
-
-  let match;
-  while ((match = fontFunctionPattern.exec(content)) !== null) {
-    const functionName = match[1];
-    const optionsStr = `{${match[2]}}`;
-
-    // Check if this is a Google Font function (not localFont)
-    if (functionName !== "localFont" && isValidGoogleFontName(functionName)) {
-      try {
-        // Parse the options object
-        const options = eval(`(${optionsStr})`);
-
-        // Calculate line number
-        const lineNumber = content.substring(0, match.index).split("\n").length;
-
-        imports.push({
-          type: "google",
-          family: functionName.replace(/_/g, " "),
-          options,
-          file: filePath,
-          line: lineNumber,
-        });
-      } catch (error) {
-        console.warn(
-          `Failed to parse font options in ${filePath}:${match[1]}`,
-          error
-        );
-      }
-    }
-  }
-
-  return imports;
-}
-
-/**
- * Scan for local font imports like localFont({ src: './font.woff2' })
- * Handles multi-line localFont declarations with nested braces
- */
-function scanForLocalFontImports(
-  content: string,
-  filePath: string
-): FontImport[] {
-  const imports: FontImport[] = [];
-
-  // Find all localFont( occurrences
-  const localFontStart = /localFont\s*\(/g;
-  let match;
-
-  while ((match = localFontStart.exec(content)) !== null) {
-    const startIndex = match.index + match[0].length;
-
-    // Find the matching closing parenthesis by counting braces and parens
-    let braceCount = 0;
-    let parenCount = 1; // We already have the opening paren from localFont(
-    let endIndex = startIndex;
-    let inString = false;
-    let stringChar = "";
-
-    for (let i = startIndex; i < content.length && parenCount > 0; i++) {
-      const char = content[i];
-      const prevChar = i > 0 ? content[i - 1] : "";
-
-      // Handle string literals (skip counting braces/parens in strings)
-      if ((char === '"' || char === "'" || char === "`") && prevChar !== "\\") {
-        if (!inString) {
-          inString = true;
-          stringChar = char;
-        } else if (char === stringChar) {
-          inString = false;
-          stringChar = "";
-        }
-      }
-
-      if (!inString) {
-        if (char === "{") braceCount++;
-        else if (char === "}") braceCount--;
-        else if (char === "(") parenCount++;
-        else if (char === ")") parenCount--;
-      }
-
-      endIndex = i;
-    }
-
-    // Extract the options string (should start with { and end with })
-    const fullCallStr = content.substring(startIndex, endIndex + 1);
-    const optionsMatch = fullCallStr.match(/^\s*(\{[\s\S]*\})\s*\)?$/);
-
-    if (optionsMatch) {
-      const optionsStr = optionsMatch[1];
-
-      try {
-        // Parse the options object
-        const options = eval(`(${optionsStr})`);
-
-        // Extract font family name from src path
-        const src = options.src;
-        const fontFamily = extractFontFamilyFromSrc(src);
-
-        // Calculate line number
-        const lineNumber = content.substring(0, match.index).split("\n").length;
-
-        imports.push({
-          type: "local",
-          family: fontFamily,
-          options,
-          file: filePath,
-          line: lineNumber,
-        });
-      } catch (error) {
-        console.warn(
-          `Failed to parse local font options in ${filePath}:${content.substring(0, match.index).split("\n").length}`,
-          error
-        );
-      }
-    }
-  }
-
-  return imports;
-}
-
-/**
- * Check if a function name is a valid Google Font name
- * Uses font-data.json which contains all 1000+ Google Fonts
- */
-function isValidGoogleFontName(name: string): boolean {
-  // Convert underscores to spaces for lookup
-  // e.g., "Roboto_Mono" -> "Roboto Mono"
-  const fontFamily = name.replace(/_/g, " ");
-
-  return isFontAvailable(fontFamily);
-}
-
-/**
- * Extract font family name from src path
- */
-function extractFontFamilyFromSrc(
-  src: string | Array<{ path: string }>
-): string {
-  let pathStr: string;
-
-  if (typeof src === "string") {
-    pathStr = src;
-  } else if (Array.isArray(src) && src.length > 0) {
-    pathStr = src[0].path;
-  } else {
-    return "local-font";
-  }
-
-  // Extract filename without extension
-  const filename = path.basename(pathStr, path.extname(pathStr));
-  return filename.replace(/[-_]/g, " ");
 }

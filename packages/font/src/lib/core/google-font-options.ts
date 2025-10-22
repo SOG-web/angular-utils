@@ -102,11 +102,6 @@ export interface GoogleFontOptions<
   variableAxes?: VariableFontAxes;
 
   /**
-   * Default values for variable font axes
-   */
-  defaultAxes?: Record<string, number>;
-
-  /**
    * Font subsetting configuration
    */
   subset?: FontSubsetting;
@@ -130,10 +125,4 @@ export interface GoogleFontOptions<
    * Retry callback
    */
   onRetry?: (attempt: number) => void;
-
-  /**
-   * Fallback font to use on error
-   * @default 'system-ui'
-   */
-  fallbackFont?: string;
 }

@@ -15,8 +15,6 @@ export interface FontBuilderOptions extends JsonObject {
   projectRoot: string;
   sourceRoot: string;
   fontFile: string;
-  assets: string[];
-  styles: string[];
 }
 
 /**
