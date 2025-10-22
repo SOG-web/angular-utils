@@ -26,7 +26,7 @@
   },
   "private": true,
   "dependencies": {
-    "@sog-web/angular-utils-font": "workspace:*",
+    "angular-fonts": "workspace:*",
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",

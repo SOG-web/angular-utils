@@ -19,8 +19,8 @@ module.exports = {
     },
   },
   moduleNameMapper: {
-    "^@sog-web/angular-utils-font$": "<rootDir>/src/public-api.ts",
-    "^@sog-web/angular-utils-font/(.*)$": "<rootDir>/src/$1/public-api.ts",
+    "^angular-fonts$": "<rootDir>/src/public-api.ts",
+    "^angular-fonts/(.*)$": "<rootDir>/src/$1/public-api.ts",
   },
   transform: {
     "^.+\\.ts$": [

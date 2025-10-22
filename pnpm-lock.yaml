@@ -22,7 +22,7 @@ importers:
 
   apps/web:
     dependencies:
-      "@sog-web/angular-utils-font":
+      "angular-fonts":
         specifier: workspace:*
         version: link:../../packages/font
       "@angular/common":

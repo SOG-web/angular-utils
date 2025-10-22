@@ -1,5 +1,5 @@
 {
-  "name": "@sog-web/angular-utils-font",
+  "name": "angular-fonts",
   "version": "0.0.1",
   "description": "Optimized font loading for Angular with SSR support",
   "type": "module",
@@ -90,5 +90,8 @@
     "type": "git",
     "url": "https://github.com/SOG-web/angular-utils",
     "directory": "packages/font"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

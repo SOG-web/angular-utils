@@ -81,9 +81,9 @@ This builds all packages and publishes them to npm.
 
 ## Package Configuration
 
-### Font Package (`@sog-web/angular-utils-font`)
+### Font Package (`angular-fonts`)
 
-- **Name**: `@sog-web/angular-utils-font`
+- **Name**: `angular-fonts`
 - **Current Version**: `2.0.0`
 - **Registry**: npm (public)
 - **Files Included**: `dist/`, `builders.json`, `README.md`, `package.json`

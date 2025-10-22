@@ -30,7 +30,7 @@ You have Rubik font files in `apps/web/static/`. Here's how to use them:
 
 ```typescript
 // fonts.ts
-import { localFont } from "@sog-web/angular-utils-font/local";
+import { localFont } from "angular-fonts/local";
 
 export const rubik = localFont({
   src: "./static/Rubik-Regular.ttf",

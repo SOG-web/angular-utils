@@ -19,7 +19,7 @@ The build-time font optimization is now **fully configured and working**. Here's
 ```json
 {
   "font-optimize": {
-    "builder": "@sog-web/angular-utils-font:optimize",
+    "builder": "angular-fonts:optimize",
     "options": {
       "outputPath": "public", // ✅ Dev server can access
       "projectRoot": "",

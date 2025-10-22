@@ -2,11 +2,10 @@
   <div class="container mx-auto px-4 py-12 max-w-6xl">
     <!-- Header -->
     <header class="text-center mb-12">
-      <h1 class="text-5xl font-bold text-gray-900 mb-4">
-        @sog-web/angular-utils-font
-      </h1>
+      <h1 class="text-5xl font-bold text-gray-900 mb-4">angular-fonts</h1>
       <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-        Optimized font loading for Angular with SSR support. Experience real-time font switching with Google Fonts.
+        Optimized font loading for Angular with SSR support. Experience real-time font switching
+        with Google Fonts.
       </p>
     </header>
 
@@ -15,9 +14,7 @@
       <div class="grid md:grid-cols-2 gap-8">
         <!-- Font Selector -->
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-3">
-            Select Font Family
-          </label>
+          <label class="block text-sm font-semibold text-gray-700 mb-3"> Select Font Family </label>
           <div class="space-y-2">
             @for (font of fonts; track font.name) {
               <button
@@ -33,11 +30,13 @@
                 <div class="flex items-center justify-between">
                   <div class="font-semibold">{{ font.name }}</div>
                   @if (font.name === 'Rubik') {
-                    <span class="text-xs px-2 py-1 rounded-full" 
-                          [class.bg-green-100]="selectedFont().name !== font.name"
-                          [class.text-green-700]="selectedFont().name !== font.name"
-                          [class.bg-green-200]="selectedFont().name === font.name"
-                          [class.text-green-900]="selectedFont().name === font.name">
+                    <span
+                      class="text-xs px-2 py-1 rounded-full"
+                      [class.bg-green-100]="selectedFont().name !== font.name"
+                      [class.text-green-700]="selectedFont().name !== font.name"
+                      [class.bg-green-200]="selectedFont().name === font.name"
+                      [class.text-green-900]="selectedFont().name === font.name"
+                    >
                       Local
                     </span>
                   }
@@ -46,13 +45,11 @@
               </button>
             }
           </div>
-    </div>
+        </div>
 
         <!-- Weight Selector -->
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-3">
-            Select Font Weight
-          </label>
+          <label class="block text-sm font-semibold text-gray-700 mb-3"> Select Font Weight </label>
           <div class="grid grid-cols-3 gap-3">
             @for (weight of weights; track weight) {
               <button
@@ -111,12 +108,16 @@
 
       <!-- Weight Comparison Grid -->
       <div class="p-6 bg-gray-50 rounded-xl">
-        <div class="text-xs text-gray-500 uppercase tracking-wider mb-4">All Weights Comparison</div>
+        <div class="text-xs text-gray-500 uppercase tracking-wider mb-4">
+          All Weights Comparison
+        </div>
         <div class="grid md:grid-cols-2 gap-4">
           @for (weight of weights; track weight) {
-            <div class="p-4 bg-white rounded-lg border-2 transition-all duration-200"
-                 [class.border-purple-500]="selectedWeight() === weight"
-                 [class.border-gray-200]="selectedWeight() !== weight">
+            <div
+              class="p-4 bg-white rounded-lg border-2 transition-all duration-200"
+              [class.border-purple-500]="selectedWeight() === weight"
+              [class.border-gray-200]="selectedWeight() !== weight"
+            >
               <div class="text-xs text-gray-500 mb-2">Weight {{ weight }}</div>
               <div
                 class="text-2xl transition-all duration-300"
@@ -153,7 +154,7 @@
       <div class="mt-6 p-6 bg-gray-900 rounded-lg overflow-x-auto">
         @if (selectedFont().name !== 'Rubik') {
           <pre class="text-sm text-gray-100"><code>// Google Font
-import &#123; {{ selectedFont().name.replace(' ', '_') }} &#125; from '@sog-web/angular-utils-font/google';
+import &#123; {{ selectedFont().name.replace(' ', '_') }} &#125; from 'angular-fonts/google';
 
 export const {{ selectedFont().name.toLowerCase().replace(' ', '') }} = {{ selectedFont().name.replace(' ', '_') }}(&#123;
   weights: [{{ weights.join(', ') }}],
@@ -164,7 +165,7 @@ export const {{ selectedFont().name.toLowerCase().replace(' ', '') }} = {{ selec
 &#125;);</code></pre>
         } @else {
           <pre class="text-sm text-gray-100"><code>// Local Font
-import &#123; localFont &#125; from '@sog-web/angular-utils-font/local';
+import &#123; localFont &#125; from 'angular-fonts/local';
 
 export const rubikFamily = localFont(&#123;
   src: [
@@ -184,9 +185,12 @@ export const rubikFamily = localFont(&#123;
 
     <!-- Footer -->
     <footer class="text-center mt-12 text-gray-600">
-      <p class="mb-2">Built with Angular 20 + @sog-web/angular-utils-font</p>
+      <p class="mb-2">Built with Angular 20 + angular-fonts</p>
       <p class="text-sm">
-        <a href="https://github.com/SOG-web/angular-utils" class="text-indigo-600 hover:text-indigo-700 transition-colors">
+        <a
+          href="https://github.com/SOG-web/angular-utils"
+          class="text-indigo-600 hover:text-indigo-700 transition-colors"
+        >
           View on GitHub
         </a>
       </p>
