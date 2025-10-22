@@ -1,6 +1,6 @@
 {
   "name": "@angular-utils/font",
-  "version": "2.0.0",
+  "version": "0.0.1",
   "description": "Optimized font loading for Angular with SSR support",
   "type": "module",
   "main": "./dist/index.js",
@@ -40,7 +40,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:integration": "jest --testMatch='**/*.integration.test.ts'",
-    "test:unit": "jest --testMatch='**/*.test.ts' --testPathIgnorePatterns='integration'"
+    "test:unit": "jest --testMatch='**/*.test.ts' --testPathIgnorePatterns='integration'",
+    "publish": "npm publish"
   },
   "peerDependencies": {
     "@angular/common": ">=17.0.0",
