@@ -83,6 +83,13 @@ export async function loadGoogleFontBuildTime(
   const downloadedFiles: FontFile[] = [];
   const fontDir = `${outputPath}/assets/fonts/${fontFamily.toLowerCase().replace(/\s+/g, "-")}`;
 
+  // Clean up old font files before downloading new ones
+  try {
+    await fs.promises.rm(fontDir, { recursive: true, force: true });
+  } catch (error) {
+    // Directory might not exist, which is fine
+  }
+
   // Ensure directory exists
   await fs.promises.mkdir(fontDir, { recursive: true });
 
@@ -118,7 +125,11 @@ export async function loadGoogleFontBuildTime(
   for (const fontFile of fontFiles) {
     const fileName = fontFile.googleFontFileUrl.split("/").pop()!;
     const localPath = `/assets/fonts/${fontFamily.toLowerCase().replace(/\s+/g, "-")}/${fileName}`;
-    optimizedCSS = optimizedCSS.replace(fontFile.googleFontFileUrl, localPath);
+    // Use replaceAll to replace all occurrences (important for variable fonts where the same file is used for multiple weights)
+    optimizedCSS = optimizedCSS.replaceAll(
+      fontFile.googleFontFileUrl,
+      localPath
+    );
   }
 
   // Add fallback font metrics if enabled (default: true)
