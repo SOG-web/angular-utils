@@ -1,5 +1,5 @@
 {
-  "name": "@angular-utils/font",
+  "name": "@sog-web/angular-utils-font",
   "version": "0.0.1",
   "description": "Optimized font loading for Angular with SSR support",
   "type": "module",
