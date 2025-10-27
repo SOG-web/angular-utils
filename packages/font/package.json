@@ -1,6 +1,6 @@
 {
   "name": "angular-fonts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Optimized font loading for Angular with SSR support",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,7 @@
   },
   "files": [
     "dist",
+    "src/lib/builders/optimize/schema.json",
     "builders.json",
     "README.md",
     "package.json"

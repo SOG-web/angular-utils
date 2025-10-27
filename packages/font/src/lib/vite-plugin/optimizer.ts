@@ -3,6 +3,8 @@ import { loadGoogleFontBuildTime } from "../../google/build-time-loader.js";
 import { loadLocalFontBuildTime } from "../../local/build-time-loader.js";
 import { GoogleFontOptions } from "../core/google-font-options.js";
 import { LocalFontOptions } from "../core/types.js";
+import fs from "node:fs";
+import path from "node:path";
 
 /**
  * Optimize fonts during build
@@ -17,11 +19,17 @@ export async function optimizeFonts(
   }
 ): Promise<OptimizationResult> {
   const { outputDir } = options;
-  const fs = await import("node:fs");
-  const path = await import("node:path");
+
+  console.log("🔧 Optimizing opt fonts...", outputDir);
 
   // Ensure output directory exists
-  await fs.promises.mkdir(outputDir, { recursive: true });
+  try {
+    await fs.promises.mkdir(outputDir, { recursive: true });
+  } catch (error) {
+    console.error(`Failed to create output directory: ${outputDir}`, error);
+  }
+
+  console.log(`📂 Output directory: ${outputDir}`);
 
   const results: OptimizationResult = {
     css: "",

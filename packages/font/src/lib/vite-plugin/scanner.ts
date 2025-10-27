@@ -1,6 +1,7 @@
 import type { FontImport } from "./types.js";
 import {
   scanCreateGoogleFontPattern,
+  scanDirectFunctionPattern,
   scanLocalFontImports as scanLocalFontImportsCore,
   type FontImportBase,
 } from "../core/font-scanner-core.js";
@@ -22,6 +23,8 @@ export async function scanForFontImports(
     }
 
     const content = fs.readFileSync(fontsFile, "utf8");
+    console.log(`Scanning fonts file: ${fontsFile}`);
+    console.log(content);
     const fontImports: FontImport[] = [];
 
     // Scan for Google Font imports using createGoogleFont() pattern
@@ -30,6 +33,17 @@ export async function scanForFontImports(
       validateGoogleFonts: true,
     }) as FontImportBase[];
     fontImports.push(...googleFontImports);
+
+    // Scan for Google Font imports using direct function pattern (Inter(), Roboto_Mono(), etc.)
+    const directFunctionImports = scanDirectFunctionPattern(
+      content,
+      fontsFile,
+      {
+        includeMetadata: false,
+        validateGoogleFonts: true,
+      }
+    ) as FontImportBase[];
+    fontImports.push(...directFunctionImports);
 
     // Scan for local font imports
     const localFontImports = scanLocalFontImportsCore(content, fontsFile, {

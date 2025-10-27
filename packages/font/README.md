@@ -291,6 +291,211 @@ module.exports = {
 };
 ```
 
+## Vite Plugin (AnalogJS Support)
+
+For projects using Vite or AnalogJS, use the Vite plugin for seamless font optimization.
+
+### Quick Start with Vite
+
+```typescript
+// vite.config.ts
+import { defineConfig } from "vite";
+import angular from "@analogjs/vite-plugin-angular";
+import { angularFontPlugin } from "angular-fonts/vite";
+
+export default defineConfig({
+  plugins: [
+    angular(),
+    angularFontPlugin({
+      // All options are optional with smart defaults
+      injectHTML: true, // Auto-inject fonts into HTML (default: true)
+      injectTailwind: "v4", // Auto-inject Tailwind config (default: false)
+    }),
+  ],
+});
+```
+
+### Configuration Options
+
+```typescript
+angularFontPlugin({
+  // Font file path (relative to Vite root)
+  // If not provided, auto-discovers in:
+  // - src/fonts.ts
+  // - src/app/fonts.ts
+  // - src/lib/fonts.ts
+  // - src/config/fonts.ts
+  fontsFile?: string;
+
+  // Output directory for fonts (default: "dist/assets")
+  outputDir?: string;
+
+  // Generate preload links file (default: true)
+  injectPreloads?: boolean;
+
+  // Generate CSS file (default: true)
+  injectCSS?: boolean;
+
+  // Enable font subsetting (default: true)
+  subsetting?: boolean;
+
+  // Auto-inject font CSS and preloads into HTML (default: true)
+  // Set to false to disable HTML injection entirely
+  injectHTML?: boolean;
+
+  // Path to index.html (relative to Vite root)
+  // If not provided, looks in src/index.html
+  // Set to false to disable HTML processing
+  indexHtml?: string | false;
+
+  // Tailwind integration
+  // - false: No Tailwind injection (default)
+  // - 'v3': Inject into tailwind.config.js
+  // - 'v4': Inject @theme into styles file
+  // - true: Auto-detect version (defaults to v4)
+  injectTailwind?: boolean | "v3" | "v4";
+
+  // Path to main styles file (relative to Vite root)
+  // Used for Tailwind v4 injection
+  // Auto-discovers: styles.css, styles.scss, global.css, etc.
+  stylesFile?: string;
+
+  // Path to Tailwind config (relative to Vite root)
+  // Used for Tailwind v3 injection
+  // Auto-discovers: tailwind.config.{js,ts,cjs,mjs}
+  tailwindFile?: string;
+});
+```
+
+### How It Works
+
+The Vite plugin provides automatic:
+
+1. **Font File Discovery**: Checks 4 common locations for `fonts.ts`
+2. **HTML Injection**: Automatically injects font CSS and preload links into `index.html` using idempotent markers (won't duplicate on hot reload)
+3. **Tailwind Integration**: Injects CSS variables into your Tailwind config (v3 or v4)
+4. **CSS Variables**: Generates `:root` CSS variables for all fonts
+5. **Build Optimization**: Processes fonts during Vite's build phase
+
+### Example with Full Configuration
+
+```typescript
+// vite.config.ts
+import { defineConfig } from "vite";
+import angular from "@analogjs/vite-plugin-angular";
+import { angularFontPlugin } from "angular-fonts/vite";
+
+export default defineConfig({
+  plugins: [
+    angular(),
+    angularFontPlugin({
+      // Custom font file location
+      fontsFile: "src/config/fonts.ts",
+
+      // Custom HTML file
+      indexHtml: "src/index.html",
+
+      // Enable Tailwind v4 injection
+      injectTailwind: "v4",
+      stylesFile: "src/styles.css",
+
+      // Customize output
+      outputDir: "public/assets",
+
+      // Enable all optimizations
+      subsetting: true,
+      injectPreloads: true,
+      injectCSS: true,
+      injectHTML: true,
+    }),
+  ],
+});
+```
+
+### Minimal Configuration (Uses Defaults)
+
+```typescript
+// vite.config.ts
+import { defineConfig } from "vite";
+import angular from "@analogjs/vite-plugin-angular";
+import { angularFontPlugin } from "angular-fonts/vite";
+
+export default defineConfig({
+  plugins: [
+    angular(),
+    angularFontPlugin(), // That's it! Auto-discovers everything
+  ],
+});
+```
+
+The plugin will:
+
+- ✅ Auto-discover `src/fonts.ts` (or alternatives)
+- ✅ Auto-discover `src/index.html`
+- ✅ Inject font CSS and preloads into HTML
+- ✅ Generate optimized fonts in `dist/assets`
+
+### Differences from Angular CLI Builder
+
+| Feature            | Angular CLI Builder | Vite Plugin           |
+| ------------------ | ------------------- | --------------------- |
+| **Font Discovery** | 4 locations checked | 4 locations checked   |
+| **HTML Injection** | ✅ Automatic        | ✅ Automatic          |
+| **Tailwind v4**    | ✅ Supported        | ✅ Supported          |
+| **Tailwind v3**    | ✅ Supported        | ✅ Supported          |
+| **CSS Variables**  | ✅ Generated        | ✅ Generated          |
+| **Preload Links**  | ✅ Injected         | ✅ Injected           |
+| **Configuration**  | `angular.json`      | `vite.config.ts`      |
+| **Hot Reload**     | ❌                  | ✅ Idempotent markers |
+| **Build Tool**     | Angular CLI         | Vite                  |
+
+### Idempotent Injection
+
+The Vite plugin uses HTML comment markers to prevent duplicate injections during hot reloads:
+
+```html
+<head>
+  <!-- Font CSS -->
+  <link rel="stylesheet" href="assets/fonts.css" />
+  <!-- End Font CSS -->
+
+  <!-- Font Preloads -->
+  <link
+    rel="preload"
+    href="assets/fonts/inter-400.woff2"
+    as="font"
+    type="font/woff2"
+    crossorigin
+  />
+  <!-- End Font Preloads -->
+</head>
+```
+
+Running the plugin again will **replace** the content between markers, not add duplicates.
+
+### Disable Features Selectively
+
+```typescript
+// Disable HTML injection (manual control)
+angularFontPlugin({
+  injectHTML: false,
+  // Fonts still optimized, but you manually add to HTML
+});
+
+// Disable Tailwind (use manual CSS variables)
+angularFontPlugin({
+  injectTailwind: false,
+  // CSS variables still generated in fonts.css
+});
+
+// Minimal plugin (just optimize fonts)
+angularFontPlugin({
+  injectHTML: false,
+  injectTailwind: false,
+  // Just generates fonts.css and font files
+});
+```
+
 ## Build-time Optimization
 
 For optimal performance, use the Angular CLI builder to optimize fonts at build time.
